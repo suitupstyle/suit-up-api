@@ -1,5 +1,5 @@
 import app from './app'
-import { AppDataSource } from './utils/data-source'
+import { AppDataSource } from './database/data-source'
 import logger from './utils/logger'
 
 const PORT = process.env.PORT ?? 3000
