@@ -11,7 +11,11 @@
         "lint": "eslint . --ext .ts",
         "format": "prettier --write .",
         "prepare": "husky install",
-        "commit": "git cz"
+        "commit": "git cz",
+        "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js",
+        "migration:generate": "pnpm typeorm migration:generate -- -n",
+        "migration:run": "pnpm typeorm migration:run",
+        "migration:revert": "pnpm typeorm migration:revert"
     },
     "keywords": [],
     "author": "",
@@ -22,6 +26,9 @@
         "exceljs": "^4.4.0",
         "express": "^5.1.0",
         "stripe": "^18.3.0",
+        "pg": "^8.16.3",
+        "reflect-metadata": "^0.2.2",
+        "typeorm": "^0.3.25",
         "winston": "^3.17.0"
     },
     "devDependencies": {
