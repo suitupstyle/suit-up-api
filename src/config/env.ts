@@ -15,7 +15,7 @@ const env: EnvConfig = {
     PORT: parseInt(process.env.PORT ?? '3000', 10),
     WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL ?? 'info',
     STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
 }
 
 for (const [key, value] of Object.entries(env)) {

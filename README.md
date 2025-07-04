@@ -25,3 +25,4 @@ pnpm install
 
 # Initialize Husky hooks
 pnpm prepare
+```
