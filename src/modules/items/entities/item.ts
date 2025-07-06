@@ -1,4 +1,5 @@
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Order } from '../../orders/entities/order'
 import { Preorder } from '../../orders/entities/preorder'
 
 @Entity({ name: 'items' })
@@ -14,4 +15,7 @@ export class Item {
 
     @ManyToMany(() => Preorder, (preorder) => preorder.items)
     preorders!: Preorder[]
+
+    @ManyToMany(() => Order, (order) => order.items)
+    orders!: Order[]
 }

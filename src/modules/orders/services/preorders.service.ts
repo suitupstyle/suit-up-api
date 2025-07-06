@@ -24,6 +24,7 @@ export class PreorderService {
         }
 
         const preorder = this.preorderRepo.create({ items })
+
         return this.preorderRepo.save(preorder)
     }
 
@@ -34,9 +35,23 @@ export class PreorderService {
         })
     }
 
+    async updateImages(
+        preorder: Preorder,
+        frontImageUrl: string,
+        sideImageUrl: string
+    ): Promise<Preorder> {
+        if (!frontImageUrl || !sideImageUrl) {
+            throw new HttpError(400, 'Both frontImageUrl and sideImageUrl are required')
+        }
+        preorder.frontImageUrl = frontImageUrl
+        preorder.sideImageUrl = sideImageUrl
+
+        return this.preorderRepo.save(preorder)
+    }
+
     async measure(preorder: Preorder): Promise<Preorder> {
         if (!preorder.frontImageUrl || !preorder.sideImageUrl) {
-            throw new HttpError(400, 'Both front and side images are required')
+            throw new HttpError(400, 'Image URLs not set on preorder')
         }
 
         try {
@@ -46,6 +61,7 @@ export class PreorderService {
             })
 
             preorder.measurementData = response.data
+
             return this.preorderRepo.save(preorder)
         } catch (err: any) {
             logger.error('3DLOOK API error:', err.response?.data ?? err.message)

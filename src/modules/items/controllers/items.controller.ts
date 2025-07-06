@@ -1,24 +1,29 @@
-import { Request, Response, NextFunction } from 'express'
-import { AppDataSource } from '../../../database/data-source'
+import { NextFunction, Request, Response } from 'express'
+import { SuccessResponse } from '../../../utils/response'
 import { Item } from '../entities/item'
-import logger from '../../../utils/logger'
+import { ItemService } from '../services/items.service'
 
-export const listItems = async (req: Request, res: Response, next: NextFunction) => {
+const service = new ItemService()
+
+export const listItems = async (
+    _req: Request,
+    res: Response<SuccessResponse<Item[]>>,
+    next: NextFunction
+) => {
     try {
-        const repo = AppDataSource.getRepository(Item)
+        const { data, total } = await service.list()
 
-        const items = await repo.find()
-
-        return res.status(200).json({
-            data: items,
+        const payload: SuccessResponse<Item[]> = {
+            data,
             meta: {
                 page: 1,
-                limit: 20,
-                total: items.length,
+                limit: data.length,
+                total,
             },
-        })
+        }
+
+        return res.status(200).json(payload)
     } catch (err) {
-        logger.error('Error fetching items:', err)
-        return next(err)
+        next(err)
     }
 }

@@ -1,44 +1,58 @@
 import { NextFunction, Request, Response } from 'express'
-import { SuccessResponse } from '../../../utils/response'
-import { PreorderService } from '../services/preorder.services'
+import { HttpError } from '../../../utils/error'
+import { ErrorResponse, SuccessResponse } from '../../../utils/response'
+import { Preorder } from '../entities/preorder'
+import { MeasurePreorderInput } from '../interfaces/measure-preorder-input.interface'
+import { PreorderService } from '../services/preorders.service'
 
 const service = new PreorderService()
 
-export async function createPreorder(
+export const createPreorder = async (
     req: Request<{}, {}, { itemIds: number[] }>,
-    res: Response<SuccessResponse<any>>,
+    res: Response<SuccessResponse<Preorder> | ErrorResponse>,
     next: NextFunction
-) {
+) => {
     try {
         const { itemIds } = req.body
         const preorder = await service.create(itemIds)
 
-        const payload: SuccessResponse<typeof preorder> = { data: preorder }
+        const payload: SuccessResponse<Preorder> = {
+            data: preorder,
+        }
         return res.status(201).json(payload)
     } catch (err: any) {
-        // Pass structured errors to your error handler
+        if (err instanceof HttpError) {
+            return res.status(err.status).json({ error: { message: err.message } })
+        }
         return next(err)
     }
 }
 
-export async function measurePreorder(
-    req: Request<{ id: string }>,
-    res: Response<SuccessResponse<any>>,
+export const measurePreorder = async (
+    req: Request<{ id: string }, {}, MeasurePreorderInput>,
+    res: Response<SuccessResponse<Preorder> | ErrorResponse>,
     next: NextFunction
-) {
-    let preorder = null
+) => {
     try {
-        preorder = await service.findById(req.params.id)
-    } catch (err: any) {
-        return next(err)
-    }
+        const preorder = await service.findById(req.params.id)
+        if (!preorder) {
+            throw new HttpError(404, 'Preorder not found')
+        }
 
-    try {
-        const updated = await service.measure(preorder!)
-        const payload: SuccessResponse<typeof updated> = { data: updated }
+        const { frontImageUrl, sideImageUrl } = req.body
+        const withImages = await service.updateImages(preorder, frontImageUrl, sideImageUrl)
+
+        const measured = await service.measure(withImages)
+
+        const payload: SuccessResponse<Preorder> = {
+            data: measured,
+        }
 
         return res.status(200).json(payload)
     } catch (err: any) {
+        if (err instanceof HttpError) {
+            return res.status(err.status).json({ error: { message: err.message } })
+        }
         return next(err)
     }
 }

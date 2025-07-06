@@ -1,14 +1,14 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm'
 
-export class CreatePreOrderItemsJoin1751691113347 implements MigrationInterface {
+export class CreateOrderItemsJoin1751775312198 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(
             new Table({
-                name: 'preorders_items',
+                name: 'orders_items',
                 columns: [
                     {
-                        name: 'preorder_id',
-                        type: 'uuid',
+                        name: 'order_id',
+                        type: 'integer',
                         isPrimary: true,
                     },
                     {
@@ -19,8 +19,8 @@ export class CreatePreOrderItemsJoin1751691113347 implements MigrationInterface 
                 ],
                 foreignKeys: [
                     {
-                        columnNames: ['preorder_id'],
-                        referencedTableName: 'preorders',
+                        columnNames: ['order_id'],
+                        referencedTableName: 'orders',
                         referencedColumnNames: ['id'],
                         onDelete: 'CASCADE',
                     },
@@ -36,6 +36,6 @@ export class CreatePreOrderItemsJoin1751691113347 implements MigrationInterface 
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable('preorders_items')
+        await queryRunner.dropTable('orders_items')
     }
 }
