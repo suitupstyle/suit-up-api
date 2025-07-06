@@ -6,6 +6,7 @@ interface EnvConfig {
     NODE_ENV: 'development' | 'production' | 'test'
     PORT: number
     WINSTON_LOG_LEVEL: string
+    WINSTON_LOG_PATH: string
     API_VERSION: string
     STRIPE_PUBLISHABLE_KEY: string | undefined
     STRIPE_SECRET_KEY: string | undefined
@@ -20,6 +21,7 @@ const env: EnvConfig = {
     NODE_ENV: (process.env.NODE_ENV as EnvConfig['NODE_ENV']) || 'development',
     PORT: parseInt(process.env.PORT ?? '3000', 10),
     WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL ?? 'info',
+    WINSTON_LOG_PATH: process.env.WINSTON_LOG_PATH ?? 'logs',
     API_VERSION: process.env.API_VERSION ?? 'v1',
     STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
