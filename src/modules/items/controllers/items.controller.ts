@@ -1,12 +1,15 @@
-import { Request, Response } from 'express'
-import logger from '../../../utils/logger'
+import { Request, Response, NextFunction } from 'express'
+import { AppDataSource } from '../../../database/data-source'
 import { Item } from '../entities/item'
+import logger from '../../../utils/logger'
 
-export async function listItems(_req: Request, res: Response) {
+export const listItems = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const items = await Item.find()
+        const repo = AppDataSource.getRepository(Item)
 
-        res.json({
+        const items = await repo.find()
+
+        return res.status(200).json({
             data: items,
             meta: {
                 page: 1,
@@ -16,6 +19,6 @@ export async function listItems(_req: Request, res: Response) {
         })
     } catch (err) {
         logger.error('Error fetching items:', err)
-        res.status(500).json({ message: 'Internal Server Error' })
+        return next(err)
     }
 }
