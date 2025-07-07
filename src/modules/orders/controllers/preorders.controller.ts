@@ -1,37 +1,44 @@
 import { NextFunction, Request, Response } from 'express'
-import { In } from 'typeorm'
-import { AppDataSource } from '../../../database/data-source'
-import logger from '../../../utils/logger'
-import { Item } from '../../items/entities/item'
-import { Preorder } from '../entities/preorder'
+import { SuccessResponse } from '../../../utils/response'
+import { PreorderService } from '../services/preorder.services'
 
-export const createPreorder = async (req: Request, res: Response, next: NextFunction) => {
+const service = new PreorderService()
+
+export async function createPreorder(
+    req: Request<{}, {}, { itemIds: number[] }>,
+    res: Response<SuccessResponse<any>>,
+    next: NextFunction
+) {
     try {
-        const {
-            itemIds,
-        }: {
-            itemIds: number[]
-        } = req.body
+        const { itemIds } = req.body
+        const preorder = await service.create(itemIds)
 
-        const itemRepo = AppDataSource.getRepository(Item)
-        const items = await itemRepo.find({
-            where: { id: In(itemIds) },
-        })
-        if (items.length !== itemIds.length) {
-            return res.status(404).json({ message: 'One or more items not found' })
-        }
+        const payload: SuccessResponse<typeof preorder> = { data: preorder }
+        return res.status(201).json(payload)
+    } catch (err: any) {
+        // Pass structured errors to your error handler
+        return next(err)
+    }
+}
 
-        const preorderRepo = AppDataSource.getRepository(Preorder)
-        const preorder = preorderRepo.create({
-            items,
-        })
-        await preorderRepo.save(preorder)
+export async function measurePreorder(
+    req: Request<{ id: string }>,
+    res: Response<SuccessResponse<any>>,
+    next: NextFunction
+) {
+    let preorder = null
+    try {
+        preorder = await service.findById(req.params.id)
+    } catch (err: any) {
+        return next(err)
+    }
 
-        return res.status(201).json({
-            data: preorder,
-        })
-    } catch (err) {
-        logger.error('Error creating preorder:', err)
+    try {
+        const updated = await service.measure(preorder!)
+        const payload: SuccessResponse<typeof updated> = { data: updated }
+
+        return res.status(200).json(payload)
+    } catch (err: any) {
         return next(err)
     }
 }

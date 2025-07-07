@@ -8,13 +8,15 @@ interface EnvConfig {
     WINSTON_LOG_LEVEL: string
     WINSTON_LOG_PATH: string
     API_VERSION: string
-    STRIPE_PUBLISHABLE_KEY: string | undefined
-    STRIPE_SECRET_KEY: string | undefined
-    DATABASE_HOST: string | undefined
-    DATABASE_PORT: string | undefined
-    DATABASE_USER: string | undefined
-    DATABASE_PASSWORD: string | undefined
-    DATABASE_NAME: string | undefined
+    THREE_D_LOOK_API_URL: string
+    THREE_D_LOOK_API_KEY: string
+    STRIPE_PUBLISHABLE_KEY: string
+    STRIPE_SECRET_KEY: string
+    DATABASE_HOST: string
+    DATABASE_PORT: string
+    DATABASE_USER: string
+    DATABASE_PASSWORD: string
+    DATABASE_NAME: string
 }
 
 const env: EnvConfig = {
@@ -23,13 +25,15 @@ const env: EnvConfig = {
     WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL ?? 'info',
     WINSTON_LOG_PATH: process.env.WINSTON_LOG_PATH ?? 'logs',
     API_VERSION: process.env.API_VERSION ?? 'v1',
-    STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
-    DATABASE_HOST: process.env.DATABASE_HOST,
-    DATABASE_PORT: process.env.DATABASE_PORT,
-    DATABASE_USER: process.env.DATABASE_USER,
-    DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
-    DATABASE_NAME: process.env.DATABASE_NAME,
+    THREE_D_LOOK_API_URL: process.env.THREE_D_LOOK_API_URL ?? '',
+    THREE_D_LOOK_API_KEY: process.env.THREE_D_LOOK_API_URL ?? '',
+    STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY ?? '',
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
+    DATABASE_HOST: process.env.DATABASE_HOST ?? '',
+    DATABASE_PORT: process.env.DATABASE_PORT ?? '',
+    DATABASE_USER: process.env.DATABASE_USER ?? '',
+    DATABASE_PASSWORD: process.env.DATABASE_PASSWORD ?? '',
+    DATABASE_NAME: process.env.DATABASE_NAME ?? '',
 }
 
 for (const [key, value] of Object.entries(env)) {

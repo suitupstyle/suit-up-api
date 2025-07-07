@@ -10,8 +10,8 @@ import { Item } from '../../items/entities/item'
 
 @Entity({ name: 'preorders' })
 export class Preorder {
-    @PrimaryGeneratedColumn()
-    id!: number
+    @PrimaryGeneratedColumn('uuid')
+    id!: string
 
     @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
     createdAt!: Date
