@@ -36,7 +36,11 @@ const logger: Logger = createLogger({
     level: env.WINSTON_LOG_LEVEL,
     transports: [
         new transports.Console({ format: consoleFormat }),
-        new transports.File({ filename: 'logs/combined.log', level: 'info', format: fileFormat }),
+        new transports.File({
+            filename: `${env.WINSTON_LOG_PATH}/combined.log`,
+            level: 'info',
+            format: fileFormat,
+        }),
     ],
 })
 

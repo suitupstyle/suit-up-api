@@ -1,7 +1,8 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
+import { Preorder } from '../../orders/entities/preorder'
 
 @Entity({ name: 'items' })
-export class Item extends BaseEntity {
+export class Item {
     @PrimaryGeneratedColumn()
     id!: number
 
@@ -10,4 +11,7 @@ export class Item extends BaseEntity {
 
     @Column({ type: 'varchar', length: 255 })
     desc!: string
+
+    @ManyToMany(() => Preorder, (preorder) => preorder.items)
+    preorders!: Preorder[]
 }
