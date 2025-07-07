@@ -10,6 +10,8 @@ interface EnvConfig {
     API_VERSION: string
     THREE_D_LOOK_API_URL: string
     THREE_D_LOOK_API_KEY: string
+    SUPABASE_URL: string
+    SUPABASE_KEY: string
     STRIPE_PUBLISHABLE_KEY: string
     STRIPE_SECRET_KEY: string
     DATABASE_HOST: string
@@ -27,6 +29,8 @@ const env: EnvConfig = {
     API_VERSION: process.env.API_VERSION ?? 'v1',
     THREE_D_LOOK_API_URL: process.env.THREE_D_LOOK_API_URL ?? '',
     THREE_D_LOOK_API_KEY: process.env.THREE_D_LOOK_API_URL ?? '',
+    SUPABASE_URL: process.env.SUPABASE_URL ?? '',
+    SUPABASE_KEY: process.env.SUPABASE_KEY ?? '',
     STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY ?? '',
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
     DATABASE_HOST: process.env.DATABASE_HOST ?? '',
