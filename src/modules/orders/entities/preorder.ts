@@ -16,6 +16,15 @@ export class Preorder {
     @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
     createdAt!: Date
 
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    gender?: string
+
+    @Column({ type: 'integer', length: 255, nullable: true })
+    height?: number
+
+    @Column({ type: 'float', length: 255, nullable: true })
+    weight?: number
+
     @Column({ type: 'varchar', name: 'front_image_url', nullable: true })
     frontImageUrl?: string
 
