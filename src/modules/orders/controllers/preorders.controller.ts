@@ -10,7 +10,7 @@ const service = new PreorderService()
 export const createPreorder = async (
     req: Request<{}, {}, { itemIds: number[] }>,
     res: Response<SuccessResponse<Preorder> | ErrorResponse>,
-    next: NextFunction
+    next: NextFunction,
 ) => {
     try {
         const { itemIds } = req.body
@@ -31,18 +31,15 @@ export const createPreorder = async (
 export const measurePreorder = async (
     req: Request<{ id: string }, {}, MeasurePreorderInput>,
     res: Response<SuccessResponse<Preorder> | ErrorResponse>,
-    next: NextFunction
+    next: NextFunction,
 ) => {
     try {
         const preorder = await service.findById(req.params.id)
-        if (!preorder) {
-            throw new HttpError(404, 'Preorder not found')
-        }
 
-        const { frontImageUrl, sideImageUrl } = req.body
-        const withImages = await service.updateImages(preorder, frontImageUrl, sideImageUrl)
+        const data = req.body
+        const updated = await service.update(preorder!, data)
 
-        const measured = await service.measure(withImages)
+        const measured = await service.measure(updated)
 
         const payload: SuccessResponse<Preorder> = {
             data: measured,
