@@ -7,6 +7,8 @@ import { verifyAppToken } from './middlewares/verifyAppToken'
 import { errorHandler } from './middlewares/errorHandler'
 import itemsRouter from './modules/items'
 import { ordersRouter, preordersRouter } from './modules/orders'
+import paymentsRouter from './modules/payments'
+import { handleWebhook } from './modules/payments/controllers/payments.controller'
 
 const app: Application = express()
 
@@ -19,6 +21,13 @@ app.use(
         credentials: true,
     })
 )
+
+app.post(
+    `/api/${env.API_VERSION}/payments/webhook`,
+    express.raw({ type: 'application/json' }),
+    handleWebhook
+)
+
 app.use(express.json())
 
 // TODO: Protect all routes!
@@ -27,6 +36,7 @@ app.use(express.json())
 app.use(`/api/${env.API_VERSION}/items`, itemsRouter)
 app.use(`/api/${env.API_VERSION}/preorders`, preordersRouter)
 app.use(`/api/${env.API_VERSION}/orders`, ordersRouter)
+app.use(`/api/${env.API_VERSION}/payments`, paymentsRouter)
 
 app.use((_req, res) => {
     res.status(404).json({ error: { message: 'Not Found' } })

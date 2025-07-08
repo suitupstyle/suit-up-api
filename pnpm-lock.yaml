@@ -34,6 +34,9 @@ importers:
             pg:
                 specifier: ^8.16.3
                 version: 8.16.3
+            raw-body:
+                specifier: ^3.0.0
+                version: 3.0.0
             reflect-metadata:
                 specifier: ^0.2.2
                 version: 0.2.2
