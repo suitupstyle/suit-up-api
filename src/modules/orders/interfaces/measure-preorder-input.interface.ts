@@ -1,4 +1,7 @@
 export interface MeasurePreorderInput {
-    frontImageUrl: string
-    sideImageUrl: string
+    gender: 'male' | 'female'
+    height: number
+    weight: number
+    frontImage: string
+    sideImage: string
 }

@@ -8,8 +8,8 @@ interface EnvConfig {
     WINSTON_LOG_LEVEL: string
     WINSTON_LOG_PATH: string
     API_VERSION: string
-    THREE_D_LOOK_API_URL: string
-    THREE_D_LOOK_API_KEY: string
+    SAIA_API_HOST: string
+    SAIA_API_KEY: string
     SUPABASE_URL: string
     SUPABASE_KEY: string
     STRIPE_PUBLISHABLE_KEY: string
@@ -19,6 +19,7 @@ interface EnvConfig {
     DATABASE_USER: string
     DATABASE_PASSWORD: string
     DATABASE_NAME: string
+    MOCK_3DLOOK: boolean
 }
 
 const env: EnvConfig = {
@@ -27,8 +28,8 @@ const env: EnvConfig = {
     WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL ?? 'info',
     WINSTON_LOG_PATH: process.env.WINSTON_LOG_PATH ?? 'logs',
     API_VERSION: process.env.API_VERSION ?? 'v1',
-    THREE_D_LOOK_API_URL: process.env.THREE_D_LOOK_API_URL ?? '',
-    THREE_D_LOOK_API_KEY: process.env.THREE_D_LOOK_API_URL ?? '',
+    SAIA_API_HOST: process.env.SAIA_API_HOST ?? 'https://saia.3dlook.me/api/v2/',
+    SAIA_API_KEY: process.env.SAIA_API_KEY ?? '',
     SUPABASE_URL: process.env.SUPABASE_URL ?? '',
     SUPABASE_KEY: process.env.SUPABASE_KEY ?? '',
     STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY ?? '',
@@ -38,6 +39,7 @@ const env: EnvConfig = {
     DATABASE_USER: process.env.DATABASE_USER ?? '',
     DATABASE_PASSWORD: process.env.DATABASE_PASSWORD ?? '',
     DATABASE_NAME: process.env.DATABASE_NAME ?? '',
+    MOCK_3DLOOK: process.env.MOCK_3DLOOK === 'true',
 }
 
 for (const [key, value] of Object.entries(env)) {

@@ -35,14 +35,11 @@ export const measurePreorder = async (
 ) => {
     try {
         const preorder = await service.findById(req.params.id)
-        if (!preorder) {
-            throw new HttpError(404, 'Preorder not found')
-        }
 
-        const { frontImageUrl, sideImageUrl } = req.body
-        const withImages = await service.updateImages(preorder, frontImageUrl, sideImageUrl)
+        const data = req.body
+        const updated = await service.update(preorder!, data)
 
-        const measured = await service.measure(withImages)
+        const measured = await service.measure(updated)
 
         const payload: SuccessResponse<Preorder> = {
             data: measured,

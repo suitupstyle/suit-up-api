@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm'
+import { MigrationInterface, QueryRunner, Table } from 'typeorm'
 
 export class CreatePreOrder1751688458106 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
@@ -19,12 +19,27 @@ export class CreatePreOrder1751688458106 implements MigrationInterface {
                         default: 'now()',
                     },
                     {
-                        name: 'front_image_url',
+                        name: 'gender',
                         type: 'varchar',
                         isNullable: true,
                     },
                     {
-                        name: 'side_image_url',
+                        name: 'height',
+                        type: 'integer',
+                        isNullable: true,
+                    },
+                    {
+                        name: 'weight',
+                        type: 'float',
+                        isNullable: true,
+                    },
+                    {
+                        name: 'front_image',
+                        type: 'varchar',
+                        isNullable: true,
+                    },
+                    {
+                        name: 'side_image',
                         type: 'varchar',
                         isNullable: true,
                     },

@@ -1,8 +1,8 @@
 import { In, Repository } from 'typeorm'
 import { AppDataSource } from '../../../database/data-source'
 import { HttpError } from '../../../utils/error'
-import logger from "../../../utils/logger";
-import { supabase } from '../../../utils/supabase' // your Supabase client
+import logger from '../../../utils/logger'
+import { supabase } from '../../../utils/supabase'
 import { Customer } from '../../customers/entities/customer'
 import { Item } from '../../items/entities/item'
 import { Order } from '../entities/order'

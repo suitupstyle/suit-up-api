@@ -1,10 +1,12 @@
 import { In, Repository } from 'typeorm'
 import { AppDataSource } from '../../../database/data-source'
-import threeDLookClient from '../../../utils/3dlook'
 import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
+import { person, queue } from '../../../utils/saia'
+// import { urlToBase64 } from '../../../utils/url-to-base64'
 import { Item } from '../../items/entities/item'
 import { Preorder } from '../entities/preorder'
+import { MeasurePreorderInput } from '../interfaces/measure-preorder-input.interface'
 
 export class PreorderService {
     private readonly preorderRepo: Repository<Preorder>
@@ -35,36 +37,47 @@ export class PreorderService {
         })
     }
 
-    async updateImages(
-        preorder: Preorder,
-        frontImageUrl: string,
-        sideImageUrl: string
-    ): Promise<Preorder> {
-        if (!frontImageUrl || !sideImageUrl) {
-            throw new HttpError(400, 'Both frontImageUrl and sideImageUrl are required')
-        }
-        preorder.frontImageUrl = frontImageUrl
-        preorder.sideImageUrl = sideImageUrl
+    async update(preorder: Preorder, data: MeasurePreorderInput): Promise<Preorder> {
+        preorder.gender = data.gender
+        preorder.height = data.height
+        preorder.weight = data.weight
+        preorder.frontImage = data.frontImage
+        preorder.sideImage = data.sideImage
 
         return this.preorderRepo.save(preorder)
     }
 
     async measure(preorder: Preorder): Promise<Preorder> {
-        if (!preorder.frontImageUrl || !preorder.sideImageUrl) {
+        const { gender, height, weight, frontImage, sideImage } = preorder
+        if (!frontImage || !sideImage) {
             throw new HttpError(400, 'Image URLs not set on preorder')
         }
 
         try {
-            const response = await threeDLookClient.post('/persons/', {
-                front_image_url: preorder.frontImageUrl,
-                side_image_url: preorder.sideImageUrl,
+            // Images already received as Base64 from the frontend!
+            // const frontBase64 = await urlToBase64(frontImageUrl)
+            // const sideBase64 = await urlToBase64(sideImageUrl)
+
+            const taskSetId = await person.create({
+                gender: gender!,
+                height: height!,
+                weight: weight?.toFixed(1),
+                frontImage,
+                sideImage,
             })
 
-            preorder.measurementData = response.data
+            const results = await queue.getResults(taskSetId)
 
+            if (!results?.id) {
+                // Task was unsuccessful
+                throw new HttpError(504, '3DLOOK measurement error')
+            }
+
+            preorder.measurementData = results
             return this.preorderRepo.save(preorder)
         } catch (err: any) {
             logger.error('3DLOOK API error:', err.response?.data ?? err.message)
+            if (err instanceof HttpError) throw err
             throw new HttpError(err.response?.status ?? 502, '3DLOOK integration failed')
         }
     }
