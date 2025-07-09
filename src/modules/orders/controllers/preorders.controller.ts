@@ -10,7 +10,7 @@ const service = new PreorderService()
 export const createPreorder = async (
     req: Request<{}, {}, { itemIds: number[] }>,
     res: Response<SuccessResponse<Preorder> | ErrorResponse>,
-    next: NextFunction,
+    next: NextFunction
 ) => {
     try {
         const { itemIds } = req.body
@@ -31,7 +31,7 @@ export const createPreorder = async (
 export const measurePreorder = async (
     req: Request<{ id: string }, {}, MeasurePreorderInput>,
     res: Response<SuccessResponse<Preorder> | ErrorResponse>,
-    next: NextFunction,
+    next: NextFunction
 ) => {
     try {
         const preorder = await service.findById(req.params.id)

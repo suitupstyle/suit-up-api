@@ -25,11 +25,11 @@ export class Preorder {
     @Column({ type: 'float', length: 255, nullable: true })
     weight?: number
 
-    @Column({ type: 'varchar', name: 'front_image_url', nullable: true })
-    frontImageUrl?: string
+    @Column({ type: 'varchar', name: 'front_image', nullable: true })
+    frontImage?: string
 
-    @Column({ type: 'varchar', name: 'side_image_url', nullable: true })
-    sideImageUrl?: string
+    @Column({ type: 'varchar', name: 'side_image', nullable: true })
+    sideImage?: string
 
     @Column({ type: 'jsonb', name: 'measurement_data', nullable: true })
     measurementData?: Record<string, unknown>

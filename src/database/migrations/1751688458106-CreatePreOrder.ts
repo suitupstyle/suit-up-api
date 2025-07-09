@@ -34,12 +34,12 @@ export class CreatePreOrder1751688458106 implements MigrationInterface {
                         isNullable: true,
                     },
                     {
-                        name: 'front_image_url',
+                        name: 'front_image',
                         type: 'varchar',
                         isNullable: true,
                     },
                     {
-                        name: 'side_image_url',
+                        name: 'side_image',
                         type: 'varchar',
                         isNullable: true,
                     },

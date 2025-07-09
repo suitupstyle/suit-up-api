@@ -2,8 +2,8 @@ import { In, Repository } from 'typeorm'
 import { AppDataSource } from '../../../database/data-source'
 import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
-import { saia } from '../../../utils/saia'
-import { urlToBase64 } from "../../../utils/url-to-base64";
+import { person, queue } from '../../../utils/saia'
+// import { urlToBase64 } from '../../../utils/url-to-base64'
 import { Item } from '../../items/entities/item'
 import { Preorder } from '../entities/preorder'
 import { MeasurePreorderInput } from '../interfaces/measure-preorder-input.interface'
@@ -41,42 +41,39 @@ export class PreorderService {
         preorder.gender = data.gender
         preorder.height = data.height
         preorder.weight = data.weight
-        preorder.frontImageUrl = data.frontImageUrl
-        preorder.sideImageUrl = data.sideImageUrl
+        preorder.frontImage = data.frontImage
+        preorder.sideImage = data.sideImage
 
         return this.preorderRepo.save(preorder)
     }
 
     async measure(preorder: Preorder): Promise<Preorder> {
-        const { frontImageUrl, sideImageUrl } = preorder
-        if (!frontImageUrl || !sideImageUrl) {
+        const { gender, height, weight, frontImage, sideImage } = preorder
+        if (!frontImage || !sideImage) {
             throw new HttpError(400, 'Image URLs not set on preorder')
         }
 
         try {
-            const frontBase64 = await urlToBase64(frontImageUrl)
-            const sideBase64 = await urlToBase64(sideImageUrl)
+            // Images already received as Base64 from the frontend!
+            // const frontBase64 = await urlToBase64(frontImageUrl)
+            // const sideBase64 = await urlToBase64(sideImageUrl)
 
-            // FIXME: Remove fixed values
-            const taskSetId = await saia.api.person.create({
-                gender: 'female',
-                height: 170,
-                weight: '70.0',
-                frontImage: frontBase64,
-                sideImage: sideBase64,
+            const taskSetId = await person.create({
+                gender: gender!,
+                height: height!,
+                weight: weight?.toFixed(1),
+                frontImage,
+                sideImage,
             })
 
-            const results = await saia.api.queue.getResults(taskSetId)
+            const results = await queue.getResults(taskSetId)
 
-            if (!(results?.is_ready ?? false)) {
-                throw new HttpError(504, '3DLOOK measurement timed out')
-            }
-            if (!(results?.is_success ?? false)) {
-                throw new HttpError(502, '3DLOOK measurement failed')
+            if (!results?.id) {
+                // Task was unsuccessful
+                throw new HttpError(504, '3DLOOK measurement error')
             }
 
-            // TODO: Query person measurtements?!!
-            preorder.measurementData = results.data
+            preorder.measurementData = results
             return this.preorderRepo.save(preorder)
         } catch (err: any) {
             logger.error('3DLOOK API error:', err.response?.data ?? err.message)

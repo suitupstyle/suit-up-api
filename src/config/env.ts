@@ -8,6 +8,7 @@ interface EnvConfig {
     WINSTON_LOG_LEVEL: string
     WINSTON_LOG_PATH: string
     API_VERSION: string
+    SAIA_API_HOST: string
     SAIA_API_KEY: string
     SUPABASE_URL: string
     SUPABASE_KEY: string
@@ -27,6 +28,7 @@ const env: EnvConfig = {
     WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL ?? 'info',
     WINSTON_LOG_PATH: process.env.WINSTON_LOG_PATH ?? 'logs',
     API_VERSION: process.env.API_VERSION ?? 'v1',
+    SAIA_API_HOST: process.env.SAIA_API_HOST ?? 'https://saia.3dlook.me/api/v2/',
     SAIA_API_KEY: process.env.SAIA_API_KEY ?? '',
     SUPABASE_URL: process.env.SUPABASE_URL ?? '',
     SUPABASE_KEY: process.env.SUPABASE_KEY ?? '',
