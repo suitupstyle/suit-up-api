@@ -1,25 +1,25 @@
-import { NextFunction, Request, Response } from 'express'
+import { RequestHandler } from 'express'
 import { HttpError } from '../../../utils/error'
-import { ErrorResponse, SuccessResponse } from '../../../utils/response'
+import { SuccessResponse } from '../../../utils/response'
 import { Order } from '../entities/order'
-import { CreateOrderInput } from '../interfaces/create-order-input.interface'
 import { OrderService } from '../services/orders.service'
 
 const service = new OrderService()
 
-export const createOrder = async (
-    req: Request<{}, {}, CreateOrderInput>,
-    res: Response<SuccessResponse<Order> | ErrorResponse>,
-    next: NextFunction
+export const createOrder: RequestHandler = async (
+  req,
+  res,
+  next
 ) => {
-    try {
-        const order = await service.create(req.body)
-        const payload: SuccessResponse<Order> = { data: order }
-        return res.status(201).json(payload)
-    } catch (err: any) {
-        if (err instanceof HttpError) {
-            return res.status(err.status).json({ error: { message: err.message } })
-        }
-        next(err)
+  try {
+    // TODO: Data validation
+    const order = await service.create(req.body)
+    const payload: SuccessResponse<Order> = { data: order }
+    res.status(201).json(payload)
+  } catch (err: unknown) {
+    if (err instanceof HttpError) {
+      res.status(err.status).json({ error: { message: err.message } })
     }
+    next(err)
+  }
 }
