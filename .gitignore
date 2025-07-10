@@ -10,3 +10,5 @@ node_modules/
 
 # WebStorm IDE
 .idea/
+
+output/*
