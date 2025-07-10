@@ -1,5 +1,6 @@
 import { ExcelService } from '../services/excel.service';
 import { type ExcelGenerationJob } from '../../../types/definitions';
+import logger from '../../../utils/logger';
 
 /**
  * Processes individual Excel generation jobs
@@ -15,9 +16,9 @@ export class ExcelWorker {
   async processJob(job: ExcelGenerationJob): Promise<void> {
     try {
       await this.excelService.generateFromTemplate(job);
-      console.log(`Successfully generated: ${job.outputPath}`);
+      logger.info(`Successfully generated: ${job.outputPath}`);
     } catch (error) {
-      console.error(`Failed to process job: ${error}`);
+      logger.error(`Failed to process job: ${error}`);
       throw error;
     }
   }

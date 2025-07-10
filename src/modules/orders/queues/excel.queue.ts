@@ -1,6 +1,7 @@
 import { ExcelWorker } from '../workers/excel.worker';
 import { type ExcelGenerationJob, type QueueStatus } from '../../../types/definitions';
 import { ExcelService } from '../services/excel.service';
+import logger from '../../../utils/logger';
 
 
 /**
@@ -44,7 +45,7 @@ class ExcelQueue {
         await this.worker.processJob(job);
         this.lastProcessed = new Date();
       } catch (error) {
-        console.error('Job processing error:', error);
+        logger.error('Job processing error:', error);
       } finally {
         // Process next job with minimal delay
         setImmediate(() => this.processQueue());
