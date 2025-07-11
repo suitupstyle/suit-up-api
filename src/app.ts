@@ -3,6 +3,7 @@ import express, { Application } from 'express'
 import 'reflect-metadata'
 import helmet from 'helmet'
 import env from './config/env'
+import { verifyAppToken } from './middlewares/verifyAppToken'
 import itemsRouter from './modules/items'
 import { preordersRouter } from './modules/orders'
 import { errorHandler } from './middlewares/errorHandler'
@@ -19,6 +20,9 @@ app.use(
     })
 )
 app.use(express.json())
+
+// TODO: Protect all routes!
+// app.use(verifyAppToken)
 
 app.use(`/api/${env.API_VERSION}/items`, itemsRouter)
 app.use(`/api/${env.API_VERSION}/preorders`, preordersRouter)
