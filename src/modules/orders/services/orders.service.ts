@@ -3,6 +3,7 @@ import { AppDataSource } from '../../../database/data-source'
 import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
 import { supabase } from '../../../utils/supabase'
+import { ListResult } from '../../common/interfaces/list-result.interface'
 import { Customer } from '../../customers/entities/customer'
 import { Item } from '../../items/entities/item'
 import { Order } from '../entities/order'
@@ -20,6 +21,22 @@ export class OrderService {
         this.itemRepo = AppDataSource.getRepository(Item)
         this.customerRepo = AppDataSource.getRepository(Customer)
         this.orderRepo = AppDataSource.getRepository(Order)
+    }
+
+    async list(page: number, limit: number): Promise<ListResult<Order>> {
+        try {
+            const skip = (page - 1) * limit
+
+            const [data, total] = await this.orderRepo.findAndCount({
+                skip,
+                take: limit,
+            })
+
+            return { data, total }
+        } catch (err) {
+            logger.error('OrderService.list error:', err)
+            throw err
+        }
     }
 
     async create(data: CreateOrderInput): Promise<Order> {

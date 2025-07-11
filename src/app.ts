@@ -4,9 +4,9 @@ import 'reflect-metadata'
 import helmet from 'helmet'
 import env from './config/env'
 import { verifyAppToken } from './middlewares/verifyAppToken'
-import itemsRouter from './modules/items'
-import { preordersRouter } from './modules/orders'
 import { errorHandler } from './middlewares/errorHandler'
+import itemsRouter from './modules/items'
+import { ordersRouter, preordersRouter } from './modules/orders'
 
 const app: Application = express()
 
@@ -26,6 +26,7 @@ app.use(express.json())
 
 app.use(`/api/${env.API_VERSION}/items`, itemsRouter)
 app.use(`/api/${env.API_VERSION}/preorders`, preordersRouter)
+app.use(`/api/${env.API_VERSION}/orders`, ordersRouter)
 
 app.use((_req, res) => {
     res.status(404).json({ error: { message: 'Not Found' } })

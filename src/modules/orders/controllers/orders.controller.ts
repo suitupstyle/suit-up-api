@@ -1,12 +1,33 @@
 import { RequestHandler } from 'express'
-import { HttpError } from '../../../utils/error'
+import { ExcelGenerationJob } from '../../../types/definitions'
 import { SuccessResponse } from '../../../utils/response'
 import { Order } from '../entities/order'
-import { OrderService } from '../services/orders.service'
-import { ExcelGenerationJob } from '../../../types/definitions'
 import { excelQueue } from '../queues/excel.queue'
+import { OrderService } from '../services/orders.service'
 
 const service = new OrderService()
+
+export const listOrders: RequestHandler = async (req, res, next) => {
+    try {
+        const page = Math.max(1, parseInt((req.query.page as string) ?? '1', 10))
+        const limit = Math.max(1, parseInt((req.query.limit as string) ?? '20', 10))
+
+        const { data, total } = await service.list(page, limit)
+
+        const payload: SuccessResponse<Order[]> = {
+            data,
+            meta: {
+                page,
+                limit,
+                total,
+            },
+        }
+
+        res.status(200).json(payload)
+    } catch (err: unknown) {
+        next(err)
+    }
+}
 
 export const createOrder: RequestHandler = async (req, res, next) => {
     try {
@@ -15,9 +36,6 @@ export const createOrder: RequestHandler = async (req, res, next) => {
         const payload: SuccessResponse<Order> = { data: order }
         res.status(201).json(payload)
     } catch (err: unknown) {
-        if (err instanceof HttpError) {
-            res.status(err.status).json({ error: { message: err.message } })
-        }
         next(err)
     }
 }
