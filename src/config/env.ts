@@ -20,6 +20,7 @@ interface EnvConfig {
     DATABASE_PASSWORD: string
     DATABASE_NAME: string
     MOCK_3DLOOK: boolean
+    APP_TOKEN: string
 }
 
 const env: EnvConfig = {
@@ -40,6 +41,7 @@ const env: EnvConfig = {
     DATABASE_PASSWORD: process.env.DATABASE_PASSWORD ?? '',
     DATABASE_NAME: process.env.DATABASE_NAME ?? '',
     MOCK_3DLOOK: process.env.MOCK_3DLOOK === 'true',
+    APP_TOKEN: process.env.APP_TOKEN ?? '',
 }
 
 for (const [key, value] of Object.entries(env)) {
