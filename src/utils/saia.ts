@@ -1,4 +1,4 @@
-import { Person, Queue } from '@3dlook/saia-sdk'
+// import { Person, Queue } from '@3dlook/saia-sdk'
 import axios, { AxiosInstance } from 'axios'
 import env from '../config/env'
 import { setupSaiaMock } from './setup-saia-mock'
@@ -19,5 +19,14 @@ if (env.MOCK_3DLOOK) {
     setupSaiaMock(saiaHttp)
 }
 
-export const person = new Person(env.SAIA_API_HOST, saiaHttp)
-export const queue = new Queue(env.SAIA_API_HOST, saiaHttp)
+// export const person = new Person(env.SAIA_API_HOST, saiaHttp)
+// export const queue = new Queue(env.SAIA_API_HOST, saiaHttp)
+export async function initSaia() {
+    // dynamic ESM import from CJS
+    const { Person, Queue } = await import('@3dlook/saia-sdk')
+
+    const person = new Person(env.SAIA_API_HOST, saiaHttp)
+    const queue = new Queue(env.SAIA_API_HOST, saiaHttp)
+
+    return { person, queue }
+}
