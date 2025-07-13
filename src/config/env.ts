@@ -14,6 +14,7 @@ interface EnvConfig {
     SUPABASE_KEY: string
     STRIPE_PUBLISHABLE_KEY: string
     STRIPE_SECRET_KEY: string
+    STRIPE_WEBHOOK_SECRET: string
     DATABASE_HOST: string
     DATABASE_PORT: string
     DATABASE_USER: string
@@ -35,6 +36,7 @@ const env: EnvConfig = {
     SUPABASE_KEY: process.env.SUPABASE_KEY ?? '',
     STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY ?? '',
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET ?? '',
     DATABASE_HOST: process.env.DATABASE_HOST ?? '',
     DATABASE_PORT: process.env.DATABASE_PORT ?? '',
     DATABASE_USER: process.env.DATABASE_USER ?? '',
