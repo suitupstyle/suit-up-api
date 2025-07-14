@@ -3,6 +3,7 @@ import env from '../../../config/env'
 import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
 import { ErrorResponse, SuccessResponse } from '../../../utils/response'
+import { generateOrder } from '../../orders/controllers/orders.controller'
 import { CreatePaymentIntentInput } from '../interfaces/create-payment-intent-input'
 import { PaymentService } from '../services/payments.service'
 
@@ -45,9 +46,29 @@ export const handleWebhook: RequestHandler = async (
     const eventType = event?.type
     switch (eventType) {
         case 'payment_intent.succeeded': {
-            // TODO: Generate Excel with measures from the order and store
             const intent = event.data.object
             logger.info(`PaymentIntent succeeded: ${intent.id}`)
+
+            // const orderId = intent.metadata?.orderId
+            const orderId = 1
+            logger.info(`PaymentIntent metadata: ${JSON.stringify(intent.metadata)}`)
+            if (!orderId) {
+                logger.error('No orderId in PaymentIntent metadata, skipping Excel generation')
+                break
+            }
+
+            try {
+                const fakeReq = { params: { id: orderId } } as Request
+                const fakeRes = {
+                    status: (_: number) => fakeRes,
+                    json: (_: any) => fakeRes,
+                } as unknown as Response
+                await generateOrder(fakeReq, fakeRes, next)
+                logger.info(`Excel generated for order ${orderId}`)
+            } catch (e) {
+                logger.error('Error generating order Excel:', e)
+            }
+
             break
         }
         case 'payment_intent.payment_failed': {

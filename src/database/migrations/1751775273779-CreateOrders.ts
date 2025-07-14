@@ -17,6 +17,14 @@ export class CreateOrders1751775273779 implements MigrationInterface {
                         default: 'now()',
                     },
                     {
+                        name: 'order_data',
+                        type: 'jsonb',
+                    },
+                    {
+                        name: 'jacket_data',
+                        type: 'jsonb',
+                    },
+                    {
                         name: 'measurement_data',
                         type: 'jsonb',
                         isNullable: true,
