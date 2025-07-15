@@ -280,33 +280,29 @@ export class OrderService {
                 { sheetName, cellAddress: 'H7', value: o.customer_weight },
                 { sheetName, cellAddress: 'D12', value: j.book },
                 { sheetName, cellAddress: 'D13', value: j.fabric },
+
                 { sheetName, cellAddress: 'N12', value: m.volume_params.chest },
-                { sheetName, cellAddress: 'N13', value: m.volume_params.abdomen },
-                {
-                    sheetName,
-                    cellAddress: 'N14',
-                    value: (m.volume_params.low_hips + m.volume_params.high_hips) / 2,
-                },
+                { sheetName, cellAddress: 'N13', value: m.volume_params.waist },
+                { sheetName, cellAddress: 'N14', value: m.volume_params.low_hips },
+                { sheetName, cellAddress: 'N15', value: m.volume_params.bicep },
                 { sheetName, cellAddress: 'N16', value: m.front_params.sleeve_length },
                 { sheetName, cellAddress: 'N17', value: m.front_params.sleeve_length },
                 { sheetName, cellAddress: 'N18', value: m.front_params.jacket_length },
                 { sheetName, cellAddress: 'N19', value: m.front_params.shoulders },
+                { sheetName, cellAddress: 'N23', value: m.volume_params.wrist },
+                { sheetName, cellAddress: 'N24', value: m.volume_params.neck},
 
-                { sheetName, cellAddress: 'N27', value: m.volume_params.waist },
-                {
-                    sheetName,
-                    cellAddress: 'N28',
-                    value: (m.volume_params.low_hips + m.volume_params.high_hips) / 2,
-                },
+                { sheetName, cellAddress: 'N27', value: m.volume_params.high_hips },
+                { sheetName, cellAddress: 'N28', value: m.volume_params.low_hips },
                 { sheetName, cellAddress: 'N29', value: m.volume_params.thigh },
                 { sheetName, cellAddress: 'N30', value: m.front_params.crotch_length },
                 { sheetName, cellAddress: 'N31', value: m.front_params.outseam },
                 { sheetName, cellAddress: 'N32', value: m.front_params.outseam },
-
+                { sheetName, cellAddress: 'N33', value: m.volume_params.knee },
                 { sheetName, cellAddress: 'N34', value: m.volume_params.calf },
 
                 { sheetName, cellAddress: 'N37', value: m.volume_params.chest },
-                { sheetName, cellAddress: 'N38', value: m.volume_params.abdomen },
+                { sheetName, cellAddress: 'N38', value: m.volume_params.waist },
                 { sheetName, cellAddress: 'N39', value: m.front_params.jacket_length },
             ],
             metadata: {
