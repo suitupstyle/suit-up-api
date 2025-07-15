@@ -1,0 +1,53 @@
+components:
+    schemas:
+        SuccessResponse:
+            type: object
+            properties:
+                data:
+                    description: The payload
+                    type: object
+                meta:
+                    description: Optional metadata
+                    type: object
+                    additionalProperties: true
+            required:
+                - data
+        ErrorResponse:
+            type: object
+            properties:
+                error:
+                    type: object
+                    properties:
+                        message:
+                            type: string
+        Item:
+            type: object
+            required:
+                - id
+                - name
+                - desc
+            properties:
+                id:
+                    type: integer
+                name:
+                    type: string
+                desc:
+                    type: string
+        SuccessResponse_ItemList:
+            allOf:
+                - $ref: '#/components/schemas/SuccessResponse'
+                - type: object
+                  properties:
+                      data:
+                          type: array
+                          items:
+                              $ref: '#/components/schemas/Item'
+                      meta:
+                          type: object
+                          properties:
+                              page:
+                                  type: integer
+                              limit:
+                                  type: integer
+                              total:
+                                  type: integer
