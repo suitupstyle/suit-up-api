@@ -9,7 +9,6 @@ components:
                 meta:
                     description: Optional metadata
                     type: object
-                    additionalProperties: true
             required:
                 - data
         ErrorResponse:
@@ -51,3 +50,171 @@ components:
                                   type: integer
                               total:
                                   type: integer
+        SoftValidation:
+            type: object
+            properties:
+                messages:
+                    type: string
+        VolumeParams:
+            type: object
+            properties:
+                chest: { type: number }
+                waist: { type: number }
+                low_hips: { type: number }
+                high_hips: { type: number }
+                bicep: { type: number }
+                knee: { type: number }
+                ankle: { type: number }
+                wrist: { type: number }
+                calf: { type: number }
+                thigh: { type: number }
+                mid_thigh_girth: { type: number }
+                neck: { type: number }
+                forearm: { type: number }
+                neck_girth: { type: number }
+                neck_girth_relaxed: { type: number }
+                under_bust_girth: { type: number }
+                upper_chest_girth: { type: number }
+                elbow_girth: { type: number }
+                abdomen: { type: number }
+                armscye_girth: { type: number }
+        FrontParams:
+            type: object
+            properties:
+                soft_validation:
+                    $ref: '#/components/schemas/SoftValidation'
+                body_height: { type: number }
+                outseam: { type: number }
+                outseam_from_upper_hip_level: { type: number }
+                inseam: { type: number }
+                inside_crotch_length_to_mid_thigh: { type: number }
+                inside_crotch_length_to_knee: { type: number }
+                inside_crotch_length_to_calf: { type: number }
+                crotch_length: { type: number }
+                sleeve_length: { type: number }
+                underarm_length: { type: number }
+                legs_distance: { type: number }
+                high_hips: { type: number }
+                hip_height: { type: number }
+                shoulders: { type: number }
+                chest_top: { type: number }
+                jacket_length: { type: number }
+                shoulder_length: { type: number }
+                neck: { type: number }
+                waist: { type: number }
+                waist_to_low_hips: { type: number }
+                waist_to_knees: { type: number }
+                nape_to_waist_centre_back: { type: number }
+                bust_height: { type: number }
+                shoulder_slope: { type: number }
+                shoulder_to_waist: { type: number }
+                side_neck_point_to_armpit: { type: number }
+                back_neck_height: { type: number }
+                back_neck_point_to_wrist_length: { type: number }
+                upper_hip_height: { type: number }
+                waist_height: { type: number }
+                across_back_width: { type: number }
+                outer_ankle_height: { type: number }
+                knee_height: { type: number }
+                across_back_shoulder_width: { type: number }
+                total_crotch_length: { type: number }
+                inside_leg_height: { type: number }
+                neck_length: { type: number }
+                upper_arm_length: { type: number }
+                lower_arm_length: { type: number }
+                upper_hip_to_hip_length: { type: number }
+                back_shoulder_width: { type: number }
+                rise: { type: number }
+                back_neck_to_hip_length: { type: number }
+                torso_height: { type: number }
+                front_crotch_length: { type: number }
+                back_crotch_length: { type: number }
+        SideParams:
+            type: object
+            properties:
+                soft_validation:
+                    $ref: '#/components/schemas/SoftValidation'
+                neck_to_chest: { type: number }
+                chest_to_waist: { type: number }
+                waist_to_ankle: { type: number }
+                shoulders_to_knees: { type: number }
+                side_upper_hip_level_to_knee: { type: number }
+                side_neck_point_to_upper_hip: { type: number }
+        MeasurementData:
+            type: object
+            properties:
+                id:
+                    type: integer
+                url:
+                    type: string
+                    format: uri
+                gender:
+                    type: string
+                height:
+                    type: integer
+                volume_params:
+                    $ref: '#/components/schemas/VolumeParams'
+                front_params:
+                    $ref: '#/components/schemas/FrontParams'
+                side_params:
+                    $ref: '#/components/schemas/SideParams'
+        Preorder:
+            type: object
+            properties:
+                id:
+                    type: string
+                    format: uuid
+                createdAt:
+                    type: string
+                    format: date-time
+                gender:
+                    type: string
+                height:
+                    type: integer
+                weight:
+                    type: number
+                frontImage:
+                    type: string
+                sideImage:
+                    type: string
+                measurementData:
+                    $ref: '#/components/schemas/MeasurementData'
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Item'
+        SuccessResponse_Preorder:
+            allOf:
+                - $ref: '#/components/schemas/SuccessResponse'
+                - type: object
+            properties:
+                data:
+                    $ref: '#/components/schemas/Preorder'
+                meta:
+                    nullable: true
+                    example: null
+
+        MeasurePreorderInput:
+            type: object
+            required:
+                - gender
+                - height
+                - weight
+                - frontImage
+                - sideImage
+            properties:
+                gender:
+                    type: string
+                    description: Person’s gender (e.g. "male" or "female")
+                height:
+                    type: integer
+                    description: Person’s height in centimeters
+                weight:
+                    type: number
+                    description: Person’s weight in kilograms
+                frontImage:
+                    type: string
+                    description: Base64‑encoded front photo
+                sideImage:
+                    type: string
+                    description: Base64‑encoded side photo
