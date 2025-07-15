@@ -40,6 +40,22 @@ export const createOrder: RequestHandler = async (req, res, next) => {
     }
 }
 
+export const generateOrder: RequestHandler = async (req, res, next) => {
+    // const id = parseInt(req.params.id, 10);
+    // if (isNaN(id)) {
+    //     return next(new HttpError(400, 'Invalid order ID'));
+    // }
+    const id = Math.floor(Math.random() * 100)
+
+    try {
+        const order = await service.findByIdOrFail(id)
+        const { outputFile, queueStatus } = await service.enqueueExcelGeneration(order)
+        res.json({ success: true, outputFile, queueStatus })
+    } catch (err) {
+        next(err)
+    }
+}
+
 /**
  * Example method of Excel generation using the queue system
  */
