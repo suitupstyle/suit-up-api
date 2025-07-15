@@ -37,6 +37,8 @@
         "raw-body": "^3.0.0",
         "reflect-metadata": "^0.2.2",
         "stripe": "^18.3.0",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.1",
         "typeorm": "^0.3.25",
         "typeorm-extension": "^3.7.1",
         "winston": "^3.17.0"
@@ -47,6 +49,8 @@
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.3",
         "@types/node": "^24.0.10",
+        "@types/swagger-jsdoc": "^6.0.4",
+        "@types/swagger-ui-express": "^4.1.8",
         "@typescript-eslint/eslint-plugin": "^8.35.1",
         "@typescript-eslint/parser": "^8.35.1",
         "axios-mock-adapter": "^2.1.0",

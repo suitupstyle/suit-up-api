@@ -9,6 +9,7 @@ import itemsRouter from './modules/items'
 import { ordersRouter, preordersRouter } from './modules/orders'
 import paymentsRouter from './modules/payments'
 import { handleWebhook } from './modules/payments/controllers/payments.controller'
+import { setupSwagger } from "./utils/swagger";
 
 const app: Application = express()
 
@@ -29,6 +30,8 @@ app.post(
 )
 
 app.use(express.json())
+
+setupSwagger(app)
 
 // TODO: Protect all routes!
 // app.use(verifyAppToken)
