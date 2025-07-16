@@ -15,11 +15,11 @@ export const createPaymentIntent: RequestHandler = async (
     next: NextFunction
 ) => {
     try {
-        const { amount, currency, metadata } = req.body
+        const { amount, currency, orderId } = req.body
         if (!amount || amount <= 0) {
             throw new HttpError(422, 'Invalid amount')
         }
-        const clientSecret = await service.createPaymentIntent({ amount, currency, metadata })
+        const clientSecret = await service.createPaymentIntent({ amount, currency, orderId })
         res.status(201).json({ data: { clientSecret } })
     } catch (err: any) {
         next(err)
@@ -48,6 +48,7 @@ export const handleWebhook: RequestHandler = async (
         case 'payment_intent.succeeded': {
             const intent = event.data.object
             logger.info(`PaymentIntent succeeded: ${intent.id}`)
+            logger.info(`Full metadata payload: ${JSON.stringify(intent.metadata)}`);
 
             // const orderId = intent.metadata?.orderId
             const orderId = 1

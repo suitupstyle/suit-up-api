@@ -9,7 +9,10 @@ export class PaymentService {
                 amount: input.amount,
                 currency: input.currency ?? 'usd',
                 payment_method_types: ['card', 'alipay'],
-                metadata: input.metadata,
+                metadata: {
+                    // order_id: 1,
+                    order_id: input.orderId.toString(),
+                },
             })
 
             return intent.client_secret!
