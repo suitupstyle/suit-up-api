@@ -1,8 +1,8 @@
-import express, { Router } from 'express'
-import { createPaymentIntent, handleWebhook } from '../controllers/payments.controller'
+import { Router } from 'express'
+import { createPaymentIntent } from '../controllers/payments.controller'
 
 const router = Router()
 
-router.post('/create-intent', express.json(), createPaymentIntent)
+router.post('/create-intent', createPaymentIntent)
 
 export default router

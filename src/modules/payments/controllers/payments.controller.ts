@@ -59,7 +59,7 @@ export const handleWebhook: RequestHandler = async (
             }
 
             try {
-                const fakeReq = { params: { id: orderId } } as Request
+                const fakeReq = { params: { id: orderId } } as unknown as Request
                 const fakeRes = {
                     status: (_: number) => fakeRes,
                     json: (_: any) => fakeRes,
