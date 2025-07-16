@@ -107,6 +107,10 @@ export class OrderService {
                     fabric: jacketFabric ?? 'DBK053A',
                 },
                 measurementData: preorder.measurementData,
+                pricingData: {
+                    currency: 'USD',
+                    price: items.reduce<number>((sum, item) => sum + item.price, 0) * orderQuantity,
+                },
                 customer,
                 items,
             })
@@ -141,6 +145,7 @@ export class OrderService {
                     id: 1,
                     name: 'Classic Suit',
                     desc: 'Two‑button, navy',
+                    price: 99.0,
                     preorders: [],
                     orders: [],
                 },
@@ -244,6 +249,10 @@ export class OrderService {
                     side_neck_point_to_upper_hip: 56.28,
                 },
             },
+            pricingData: {
+                currency: 'USD',
+                price: 99.0,
+            },
             deliveredAt: new Date('2025-07-14T12:00:00Z'),
             isPaid: true,
         }
@@ -263,7 +272,7 @@ export class OrderService {
         queueStatus: any
     }> {
         const id = order.id
-        const m = order.measurementData!
+        const m = order.measurementData
         const o = order.orderData
         const j = order.jacketData
 
