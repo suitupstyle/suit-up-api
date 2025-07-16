@@ -50,8 +50,8 @@ export class OrderService {
             customerName,
             customerEmail,
             customerPassword,
-            customerHeight,
-            customerWeight,
+            jacketBook,
+            jacketFabric,
         } = data
 
         const preorder = await this.preorderRepo.findOne({
@@ -99,12 +99,12 @@ export class OrderService {
                     order_type: orderType ?? 'ABC',
                     quantity: orderQuantity ?? 1,
                     lead_time: orderLeadTime ?? 1,
-                    customer_height: customerHeight ?? 175,
-                    customer_weight: customerWeight ?? '70.0',
+                    customer_height: preorder.height!,
+                    customer_weight: preorder.weight!.toFixed(1),
                 },
                 jacketData: {
-                    book: 'SUIT 2301',
-                    fabric: 'DBK053A',
+                    book: jacketBook ?? 'SUIT 2301',
+                    fabric: jacketFabric ?? 'DBK053A',
                 },
                 measurementData: preorder.measurementData,
                 customer,

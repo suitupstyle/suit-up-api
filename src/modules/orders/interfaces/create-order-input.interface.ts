@@ -8,4 +8,6 @@ export interface CreateOrderInput {
     customerPassword: string
     customerHeight: number
     customerWeight: string
+    jacketBook: string
+    jacketFabric: string
 }

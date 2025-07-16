@@ -222,9 +222,14 @@ components:
             type: object
             required:
                 - preorderId
+                - orderType
+                - orderQuantity
+                - orderLeadTime
                 - customerName
                 - customerEmail
                 - customerPassword
+                - jacketBook
+                - jacketFabric
             properties:
                 preorderId:
                     type: string
@@ -232,11 +237,14 @@ components:
                 orderType:
                     type: string
                     description: Custom order type code
+                    example: 'ABC'
                 orderQuantity:
                     type: integer
+                    example: 1
                 orderLeadTime:
                     type: integer
                     description: Lead time in days
+                    example: 1
                 customerName:
                     type: string
                 customerEmail:
@@ -245,10 +253,12 @@ components:
                 customerPassword:
                     type: string
                     format: password
-                customerHeight:
-                    type: integer
-                customerWeight:
-                    type: number
+                jacketBook:
+                    type: string
+                    example: 'SUIT 2301'
+                jacketFabric:
+                    type: string
+                    example: 'DBK053A'
 
         OrderData:
             type: object
