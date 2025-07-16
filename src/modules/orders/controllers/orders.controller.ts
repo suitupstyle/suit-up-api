@@ -31,7 +31,6 @@ export const listOrders: RequestHandler = async (req, res, next) => {
 
 export const createOrder: RequestHandler = async (req, res, next) => {
     try {
-        // TODO: Data validation
         const order = await service.create(req.body)
         const payload: SuccessResponse<Order> = { data: order }
         res.status(201).json(payload)

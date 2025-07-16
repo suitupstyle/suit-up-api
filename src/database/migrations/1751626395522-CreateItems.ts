@@ -21,6 +21,12 @@ export class CreateItems1751626395522 implements MigrationInterface {
                         type: 'varchar',
                         length: '255',
                     },
+                    {
+                        name: 'price',
+                        type: 'decimal',
+                        precision: 10,
+                        scale: 2,
+                    },
                 ],
             }),
             true
