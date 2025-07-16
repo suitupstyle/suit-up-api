@@ -290,7 +290,7 @@ export class OrderService {
                 { sheetName, cellAddress: 'N18', value: m.front_params.jacket_length },
                 { sheetName, cellAddress: 'N19', value: m.front_params.shoulders },
                 { sheetName, cellAddress: 'N23', value: m.volume_params.wrist },
-                { sheetName, cellAddress: 'N24', value: m.volume_params.neck},
+                { sheetName, cellAddress: 'N24', value: m.volume_params.neck },
 
                 { sheetName, cellAddress: 'N27', value: m.volume_params.high_hips },
                 { sheetName, cellAddress: 'N28', value: m.volume_params.low_hips },

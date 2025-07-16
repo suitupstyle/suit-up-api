@@ -7,6 +7,7 @@ interface EnvConfig {
     PORT: number
     WINSTON_LOG_LEVEL: string
     WINSTON_LOG_PATH: string
+    API_BASE_URL: string
     API_VERSION: string
     SAIA_API_HOST: string
     SAIA_API_KEY: string
@@ -29,6 +30,7 @@ const env: EnvConfig = {
     PORT: parseInt(process.env.PORT ?? '3000', 10),
     WINSTON_LOG_LEVEL: process.env.WINSTON_LOG_LEVEL ?? 'info',
     WINSTON_LOG_PATH: process.env.WINSTON_LOG_PATH ?? 'logs',
+    API_BASE_URL: process.env.API_BASE_URL ?? 'http://localhost:3000',
     API_VERSION: process.env.API_VERSION ?? 'v1',
     SAIA_API_HOST: process.env.SAIA_API_HOST ?? 'https://saia.3dlook.me/api/v2/',
     SAIA_API_KEY: process.env.SAIA_API_KEY ?? '',
