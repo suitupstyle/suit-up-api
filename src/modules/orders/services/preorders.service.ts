@@ -7,6 +7,7 @@ import { initSaia } from '../../../utils/saia'
 import { Item } from '../../items/entities/item'
 import { Preorder } from '../entities/preorder'
 import { MeasurePreorderDTO } from '../validators/measure‑preorder.schema'
+import { UpdatePreorderDTO } from '../validators/update‑preorder.schema'
 
 export class PreorderService {
     private readonly preorderRepo: Repository<Preorder>
@@ -41,7 +42,7 @@ export class PreorderService {
         })
     }
 
-    async update(preorder: Preorder, data: MeasurePreorderInput): Promise<Preorder> {
+    async update(preorder: Preorder, data: UpdatePreorderDTO): Promise<Preorder> {
         preorder.gender = data.gender
         preorder.height = data.height
         preorder.weight = data.weight
