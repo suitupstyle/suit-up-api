@@ -6,6 +6,7 @@ import {
     updatePreorder,
 } from '../controllers/preorders.controller'
 import { CreatePreorderSchema } from '../validators/create‑preorder.schema'
+import { MeasurePreorderSchema } from '../validators/measure‑preorder.schema'
 
 const router = Router()
 
@@ -95,40 +96,7 @@ router.post('/', validate(CreatePreorderSchema), createPreorder)
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post('/:id/measure', measurePreorder)
-
-/**
- * @openapi
- * /preorders/{id}/measure:
- *   post:
- *     summary: Attach images & trigger 3DLOOK measurement
- *     tags:
- *       - Preorders
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *           format: uuid
- *         required: true
- *         description: Preorder UUID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/MeasurePreorderInput'
- *     responses:
- *       200:
- *         $ref: '#/components/responses/SuccessResponse_Preorder'
- *       400:
- *         $ref: '#/components/responses/ErrorResponse'
- *       404:
- *         $ref: '#/components/responses/ErrorResponse'
- *       502:
- *         $ref: '#/components/responses/ErrorResponse'
- */
-router.post('/:id/measure', measurePreorder)
+router.post('/:id/measure', validate(MeasurePreorderSchema), measurePreorder)
 
 /**
  * @openapi

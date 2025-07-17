@@ -3,6 +3,7 @@ import { SuccessResponse } from '../../../utils/response'
 import { Preorder } from '../entities/preorder'
 import { PreorderService } from '../services/preorders.service'
 import { CreatePreorderDTO } from '../validators/create‑preorder.schema'
+import { MeasurePreorderDTO } from '../validators/measure‑preorder.schema'
 
 const service = new PreorderService()
 
@@ -21,9 +22,12 @@ export const createPreorder: RequestHandler<{}, {}, CreatePreorderDTO> = async (
     }
 }
 
-export const measurePreorder: RequestHandler = async (req, res, next) => {
+export const measurePreorder: RequestHandler<{ id: string }, {}, MeasurePreorderDTO> = async (
+    req,
+    res,
+    next
+) => {
     try {
-        // TODO: validate data
         const preorder = await service.findById(req.params.id)
 
         const data = req.body
@@ -36,6 +40,7 @@ export const measurePreorder: RequestHandler = async (req, res, next) => {
         }
 
         res.status(200).json(payload)
+        return
     } catch (err: unknown) {
         return next(err)
     }
