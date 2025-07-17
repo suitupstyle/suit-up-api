@@ -58,6 +58,9 @@ importers:
             winston:
                 specifier: ^3.17.0
                 version: 3.17.0
+            zod:
+                specifier: ^4.0.5
+                version: 4.0.5
         devDependencies:
             '@commitlint/cli':
                 specifier: ^19.8.1
@@ -4904,6 +4907,12 @@ packages:
             }
         engines: { node: '>= 10' }
 
+    zod@4.0.5:
+        resolution:
+            {
+                integrity: sha512-/5UuuRPStvHXu7RS+gmvRf4NXrNxpSllGwDnCBcJZtQsKrviYXm54yDGV2KYNLT5kq0lHGcl7lqWJLgSaG+tgA==,
+            }
+
 snapshots:
     '@3dlook/saia-sdk@2.17.0':
         dependencies:
@@ -7949,3 +7958,5 @@ snapshots:
             archiver-utils: 3.0.4
             compress-commons: 4.1.2
             readable-stream: 3.6.2
+
+    zod@4.0.5: {}
