@@ -6,16 +6,14 @@ import personMock from '../mocks/saia-person.json'
 export function setupSaiaMock(http: AxiosInstance) {
     const mock = new MockAdapter(http)
 
-    const routes: Array<[string, string | RegExp, any]> = [
-        ['post', '/persons/?measurements_type=all', queueMock],
-        ['get', '/queue/4d563d3f-38ae-4b51-8eab-2b78483b153e/', personMock],
-        ['get', '/persons/3/', personMock],
-    ]
+    mock.onPost('/persons/', undefined, { params: { measurements_type: 'all' } }).reply(
+        200,
+        queueMock
+    )
 
-    for (const [method, path, data] of routes) {
-        // @ts-ignore
-        mock[`on${method.charAt(0).toUpperCase() + method.slice(1)}`](path).reply(200, data)
-    }
+    mock.onGet(new RegExp('^/queue/[0-9a-fA-F\\-]+/$')).reply(200, personMock)
+
+    mock.onGet(new RegExp('^/persons/[^/]+/$')).reply(200, personMock)
 
     return mock
 }
