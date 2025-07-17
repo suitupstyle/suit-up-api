@@ -374,3 +374,19 @@ components:
                                   type: integer
                               total:
                                   type: integer
+
+        CreatePaymentIntentInput:
+            type: object
+            required:
+                - amount
+                - orderId
+            properties:
+                amount:
+                    type: integer
+                    description: Amount in the smallest currency unit
+                currency:
+                    type: string
+                    description: "Three‑letter ISO currency code (default: 'usd')"
+                orderId:
+                    type: integer
+                    description: Internal order ID
