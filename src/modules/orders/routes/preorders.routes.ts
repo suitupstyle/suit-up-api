@@ -7,6 +7,7 @@ import {
 } from '../controllers/preorders.controller'
 import { CreatePreorderSchema } from '../validators/create‑preorder.schema'
 import { MeasurePreorderSchema } from '../validators/measure‑preorder.schema'
+import { UpdatePreorderSchema } from '../validators/update‑preorder.schema'
 
 const router = Router()
 
@@ -127,6 +128,6 @@ router.post('/:id/measure', validate(MeasurePreorderSchema), measurePreorder)
  *       404:
  *         $ref: '#/components/schemas/ErrorResponse'
  */
-router.put('/:id', updatePreorder)
+router.put('/:id', validate(UpdatePreorderSchema), updatePreorder)
 
 export default router

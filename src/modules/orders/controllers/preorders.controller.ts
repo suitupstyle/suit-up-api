@@ -4,6 +4,7 @@ import { Preorder } from '../entities/preorder'
 import { PreorderService } from '../services/preorders.service'
 import { CreatePreorderDTO } from '../validators/create‑preorder.schema'
 import { MeasurePreorderDTO } from '../validators/measure‑preorder.schema'
+import { UpdatePreorderDTO } from '../validators/update‑preorder.schema'
 
 const service = new PreorderService()
 
@@ -46,7 +47,11 @@ export const measurePreorder: RequestHandler<{ id: string }, {}, MeasurePreorder
     }
 }
 
-export const updatePreorder: RequestHandler = async (req, res, next) => {
+export const updatePreorder: RequestHandler<{ id: string }, {}, UpdatePreorderDTO> = async (
+    req,
+    res,
+    next
+) => {
     try {
         const preorder = await service.findById(req.params.id)
 
