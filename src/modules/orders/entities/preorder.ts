@@ -7,6 +7,7 @@ import {
     JoinTable,
 } from 'typeorm'
 import { Item } from '../../items/entities/item'
+import { MeasurementData } from '../interfaces/measurement-data'
 
 @Entity({ name: 'preorders' })
 export class Preorder {
@@ -32,7 +33,7 @@ export class Preorder {
     sideImage?: string
 
     @Column({ type: 'jsonb', name: 'measurement_data', nullable: true })
-    measurementData?: Record<string, unknown>
+    measurementData?: MeasurementData
 
     @ManyToMany(() => Item, (item) => item.preorders, {
         cascade: true,

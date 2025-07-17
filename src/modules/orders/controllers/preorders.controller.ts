@@ -39,3 +39,20 @@ export const measurePreorder: RequestHandler = async (req, res, next) => {
         return next(err)
     }
 }
+
+export const updatePreorder: RequestHandler = async (req, res, next) => {
+    try {
+        const preorder = await service.findById(req.params.id)
+
+        const data = req.body
+        const updated = await service.update(preorder!, data)
+
+        const payload: SuccessResponse<Preorder> = {
+            data: updated,
+        }
+
+        res.status(200).json(payload)
+    } catch (err: unknown) {
+        return next(err)
+    }
+}

@@ -1,5 +1,9 @@
 import { Router } from 'express'
-import { createPreorder, measurePreorder } from '../controllers/preorders.controller'
+import {
+    createPreorder,
+    measurePreorder,
+    updatePreorder,
+} from '../controllers/preorders.controller'
 
 const router = Router()
 
@@ -90,5 +94,92 @@ router.post('/', createPreorder)
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/:id/measure', measurePreorder)
+
+/**
+ * @openapi
+ * /preorders:
+ *   post:
+ *     summary: Create a new preorder (items only)
+ *     tags:
+ *       - Preorders
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreatePreorderInput'
+ *     responses:
+ *       201:
+ *         $ref: '#/components/responses/SuccessResponse_Preorder'
+ *       422:
+ *         $ref: '#/components/responses/ErrorResponse'
+ *       500:
+ *         $ref: '#/components/responses/ErrorResponse'
+ */
+router.post('/', createPreorder)
+
+/**
+ * @openapi
+ * /preorders/{id}/measure:
+ *   post:
+ *     summary: Attach images & trigger 3DLOOK measurement
+ *     tags:
+ *       - Preorders
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: Preorder UUID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/MeasurePreorderInput'
+ *     responses:
+ *       200:
+ *         $ref: '#/components/responses/SuccessResponse_Preorder'
+ *       400:
+ *         $ref: '#/components/responses/ErrorResponse'
+ *       404:
+ *         $ref: '#/components/responses/ErrorResponse'
+ *       502:
+ *         $ref: '#/components/responses/ErrorResponse'
+ */
+router.post('/:id/measure', measurePreorder)
+
+/**
+ * @openapi
+ * /preorders/{id}:
+ *   put:
+ *     summary: Update an existing preorder’s metadata or images
+ *     tags:
+ *       - Preorders
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: Preorder UUID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/MeasurePreorderInput'
+ *     responses:
+ *       200:
+ *         $ref: '#/components/schemas/SuccessResponse_Preorder'
+ *       400:
+ *         $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         $ref: '#/components/schemas/ErrorResponse'
+ */
+router.put('/:id', updatePreorder)
 
 export default router

@@ -1,5 +1,5 @@
 components:
-    schemas:
+    responses:
         SuccessResponse:
             type: object
             properties:
@@ -21,6 +21,7 @@ components:
                         message:
                             type: string
 
+    schemas:
         Item:
             type: object
             required:
@@ -37,7 +38,7 @@ components:
 
         SuccessResponse_ItemList:
             allOf:
-                - $ref: '#/components/schemas/SuccessResponse'
+                - $ref: '#/components/responses/SuccessResponse'
                 - type: object
                   properties:
                       data:
@@ -203,7 +204,7 @@ components:
 
         SuccessResponse_Preorder:
             allOf:
-                - $ref: '#/components/schemas/SuccessResponse'
+                - $ref: '#/components/responses/SuccessResponse'
                 - type: object
             properties:
                 data:
@@ -236,6 +237,8 @@ components:
                 sideImage:
                     type: string
                     description: Base64‑encoded side photo
+                measurementData:
+                    $ref: '#/components/schemas/MeasurementData'
 
         CreateOrderInput:
             type: object
@@ -344,7 +347,7 @@ components:
 
         SuccessResponse_Order:
             allOf:
-                - $ref: '#/components/schemas/SuccessResponse'
+                - $ref: '#/components/responses/SuccessResponse'
                 - type: object
                   properties:
                       data:
@@ -355,7 +358,7 @@ components:
 
         SuccessResponse_OrderList:
             allOf:
-                - $ref: '#/components/schemas/SuccessResponse'
+                - $ref: '#/components/responses/SuccessResponse'
                 - type: object
                   properties:
                       data:
