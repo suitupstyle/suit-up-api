@@ -1,6 +1,8 @@
 import { Router } from 'express'
+import { validate } from '../../../middlewares/validate'
 import { verifyAppToken } from '../../../middlewares/verifyAppToken'
 import { createOrder, listOrders } from '../controllers/orders.controller'
+import { CreateOrderSchema } from '../validators/create‑order.schema'
 
 const router = Router()
 
@@ -87,6 +89,6 @@ router.get('/', verifyAppToken, listOrders)
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post('/', createOrder)
+router.post('/', validate(CreateOrderSchema), createOrder)
 
 export default router

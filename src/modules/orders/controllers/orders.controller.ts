@@ -4,6 +4,7 @@ import { SuccessResponse } from '../../../utils/response'
 import { Order } from '../entities/order'
 import { excelQueue } from '../queues/excel.queue'
 import { OrderService } from '../services/orders.service'
+import { CreateOrderDTO } from '../validators/create‑order.schema'
 
 const service = new OrderService()
 
@@ -29,13 +30,14 @@ export const listOrders: RequestHandler = async (req, res, next) => {
     }
 }
 
-export const createOrder: RequestHandler = async (req, res, next) => {
+export const createOrder: RequestHandler<{}, {}, CreateOrderDTO> = async (req, res, next) => {
     try {
         const order = await service.create(req.body)
         const payload: SuccessResponse<Order> = { data: order }
         res.status(201).json(payload)
+        return
     } catch (err: unknown) {
-        next(err)
+        return next(err)
     }
 }
 

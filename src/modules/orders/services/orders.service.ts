@@ -9,8 +9,8 @@ import { Customer } from '../../customers/entities/customer'
 import { Item } from '../../items/entities/item'
 import { Order } from '../entities/order'
 import { Preorder } from '../entities/preorder'
-import { CreateOrderInput } from '../interfaces/create-order-input.interface'
 import { excelQueue } from '../queues/excel.queue'
+import { CreateOrderDTO } from '../validators/create‑order.schema'
 
 export class OrderService {
     private readonly preorderRepo: Repository<Preorder>
@@ -41,7 +41,7 @@ export class OrderService {
         }
     }
 
-    async create(data: CreateOrderInput): Promise<Order> {
+    async create(data: CreateOrderDTO): Promise<Order> {
         const {
             preorderId,
             orderType,
