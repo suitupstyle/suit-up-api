@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MeasurementDataSchema } from './measurement-data.schema'
 
 export const MeasurePreorderSchema = z.object({
     gender: z.enum(['male', 'female']).refine((val) => ['male', 'female'].includes(val), {
@@ -19,6 +20,7 @@ export const MeasurePreorderSchema = z.object({
     sideImage: z
         .string()
         .regex(/^data:image\/(png|jpe?g|webp);base64,/, '`sideImage` must be a data URL'),
+    measurementData: MeasurementDataSchema.optional(),
 })
 
 export type MeasurePreorderDTO = z.infer<typeof MeasurePreorderSchema>
