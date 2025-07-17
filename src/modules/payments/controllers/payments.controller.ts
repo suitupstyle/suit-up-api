@@ -48,7 +48,7 @@ export const handleWebhook: RequestHandler = async (
         case 'payment_intent.succeeded': {
             const intent = event.data.object
             logger.info(`PaymentIntent succeeded: ${intent.id}`)
-            logger.info(`Full metadata payload: ${JSON.stringify(intent.metadata)}`);
+            logger.info(`Full metadata payload: ${JSON.stringify(intent.metadata)}`)
 
             // const orderId = intent.metadata?.orderId
             const orderId = 1
