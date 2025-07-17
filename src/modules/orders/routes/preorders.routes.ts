@@ -1,9 +1,11 @@
 import { Router } from 'express'
+import { validate } from '../../../middlewares/validate'
 import {
     createPreorder,
     measurePreorder,
     updatePreorder,
 } from '../controllers/preorders.controller'
+import { CreatePreorderSchema } from '../validators/create‑preorder.schema'
 
 const router = Router()
 
@@ -44,7 +46,7 @@ const router = Router()
  *       500:
  *         description: Internal server error
  */
-router.post('/', createPreorder)
+router.post('/', validate(CreatePreorderSchema), createPreorder)
 
 /**
  * @openapi
@@ -94,29 +96,6 @@ router.post('/', createPreorder)
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/:id/measure', measurePreorder)
-
-/**
- * @openapi
- * /preorders:
- *   post:
- *     summary: Create a new preorder (items only)
- *     tags:
- *       - Preorders
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreatePreorderInput'
- *     responses:
- *       201:
- *         $ref: '#/components/responses/SuccessResponse_Preorder'
- *       422:
- *         $ref: '#/components/responses/ErrorResponse'
- *       500:
- *         $ref: '#/components/responses/ErrorResponse'
- */
-router.post('/', createPreorder)
 
 /**
  * @openapi
