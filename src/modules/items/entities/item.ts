@@ -13,6 +13,9 @@ export class Item {
     @Column({ type: 'varchar', length: 255 })
     desc!: string
 
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
+    price!: number
+
     @ManyToMany(() => Preorder, (preorder) => preorder.items)
     preorders!: Preorder[]
 

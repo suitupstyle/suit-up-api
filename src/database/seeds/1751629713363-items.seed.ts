@@ -11,6 +11,7 @@ export class ItemsSeed1751629713363 implements Seeder {
             {
                 name: 'Black Professional Business Suit',
                 desc: 'Merino, notch lapel, two-button jacket + flat-front trousers',
+                price: 99.0,
             },
         ])
     }

@@ -1,5 +1,5 @@
 components:
-    schemas:
+    responses:
         SuccessResponse:
             type: object
             properties:
@@ -11,6 +11,7 @@ components:
                     type: object
             required:
                 - data
+                -
         ErrorResponse:
             type: object
             properties:
@@ -19,6 +20,8 @@ components:
                     properties:
                         message:
                             type: string
+
+    schemas:
         Item:
             type: object
             required:
@@ -32,9 +35,10 @@ components:
                     type: string
                 desc:
                     type: string
+
         SuccessResponse_ItemList:
             allOf:
-                - $ref: '#/components/schemas/SuccessResponse'
+                - $ref: '#/components/responses/SuccessResponse'
                 - type: object
                   properties:
                       data:
@@ -50,11 +54,13 @@ components:
                                   type: integer
                               total:
                                   type: integer
+
         SoftValidation:
             type: object
             properties:
                 messages:
                     type: string
+
         VolumeParams:
             type: object
             properties:
@@ -78,6 +84,7 @@ components:
                 elbow_girth: { type: number }
                 abdomen: { type: number }
                 armscye_girth: { type: number }
+
         FrontParams:
             type: object
             properties:
@@ -129,6 +136,7 @@ components:
                 torso_height: { type: number }
                 front_crotch_length: { type: number }
                 back_crotch_length: { type: number }
+
         SideParams:
             type: object
             properties:
@@ -140,6 +148,7 @@ components:
                 shoulders_to_knees: { type: number }
                 side_upper_hip_level_to_knee: { type: number }
                 side_neck_point_to_upper_hip: { type: number }
+
         MeasurementData:
             type: object
             properties:
@@ -158,6 +167,15 @@ components:
                     $ref: '#/components/schemas/FrontParams'
                 side_params:
                     $ref: '#/components/schemas/SideParams'
+
+        PricingData:
+            type: object
+            properties:
+                currency:
+                    type: string
+                price:
+                    type: number
+
         Preorder:
             type: object
             properties:
@@ -183,9 +201,10 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/Item'
+
         SuccessResponse_Preorder:
             allOf:
-                - $ref: '#/components/schemas/SuccessResponse'
+                - $ref: '#/components/responses/SuccessResponse'
                 - type: object
             properties:
                 data:
@@ -218,13 +237,21 @@ components:
                 sideImage:
                     type: string
                     description: Base64‑encoded side photo
+                measurementData:
+                    $ref: '#/components/schemas/MeasurementData'
+
         CreateOrderInput:
             type: object
             required:
                 - preorderId
+                - orderType
+                - orderQuantity
+                - orderLeadTime
                 - customerName
                 - customerEmail
                 - customerPassword
+                - jacketBook
+                - jacketFabric
             properties:
                 preorderId:
                     type: string
@@ -232,11 +259,14 @@ components:
                 orderType:
                     type: string
                     description: Custom order type code
+                    example: 'ABC'
                 orderQuantity:
                     type: integer
+                    example: 1
                 orderLeadTime:
                     type: integer
                     description: Lead time in days
+                    example: 1
                 customerName:
                     type: string
                 customerEmail:
@@ -245,10 +275,12 @@ components:
                 customerPassword:
                     type: string
                     format: password
-                customerHeight:
-                    type: integer
-                customerWeight:
-                    type: number
+                jacketBook:
+                    type: string
+                    example: 'SUIT 2301'
+                jacketFabric:
+                    type: string
+                    example: 'DBK053A'
 
         OrderData:
             type: object
@@ -286,6 +318,8 @@ components:
                     $ref: '#/components/schemas/JacketData'
                 measurementData:
                     $ref: '#/components/schemas/MeasurementData'
+                pricingData:
+                    $ref: '#/components/schemas/PricingData'
                 customer:
                     $ref: '#/components/schemas/Customer'
                 items:
@@ -313,7 +347,7 @@ components:
 
         SuccessResponse_Order:
             allOf:
-                - $ref: '#/components/schemas/SuccessResponse'
+                - $ref: '#/components/responses/SuccessResponse'
                 - type: object
                   properties:
                       data:
@@ -324,7 +358,7 @@ components:
 
         SuccessResponse_OrderList:
             allOf:
-                - $ref: '#/components/schemas/SuccessResponse'
+                - $ref: '#/components/responses/SuccessResponse'
                 - type: object
                   properties:
                       data:
@@ -340,3 +374,19 @@ components:
                                   type: integer
                               total:
                                   type: integer
+
+        CreatePaymentIntentInput:
+            type: object
+            required:
+                - amount
+                - orderId
+            properties:
+                amount:
+                    type: integer
+                    description: Amount in the smallest currency unit
+                currency:
+                    type: string
+                    description: "Three‑letter ISO currency code (default: 'usd')"
+                orderId:
+                    type: integer
+                    description: Internal order ID

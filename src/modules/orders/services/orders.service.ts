@@ -50,8 +50,8 @@ export class OrderService {
             customerName,
             customerEmail,
             customerPassword,
-            customerHeight,
-            customerWeight,
+            jacketBook,
+            jacketFabric,
         } = data
 
         const preorder = await this.preorderRepo.findOne({
@@ -99,14 +99,18 @@ export class OrderService {
                     order_type: orderType ?? 'ABC',
                     quantity: orderQuantity ?? 1,
                     lead_time: orderLeadTime ?? 1,
-                    customer_height: customerHeight ?? 175,
-                    customer_weight: customerWeight ?? '70.0',
+                    customer_height: preorder.height!,
+                    customer_weight: preorder.weight!.toFixed(1),
                 },
                 jacketData: {
-                    book: 'SUIT 2301',
-                    fabric: 'DBK053A',
+                    book: jacketBook ?? 'SUIT 2301',
+                    fabric: jacketFabric ?? 'DBK053A',
                 },
                 measurementData: preorder.measurementData,
+                pricingData: {
+                    currency: 'USD',
+                    price: items.reduce<number>((sum, item) => sum + item.price, 0) * orderQuantity,
+                },
                 customer,
                 items,
             })
@@ -141,6 +145,7 @@ export class OrderService {
                     id: 1,
                     name: 'Classic Suit',
                     desc: 'Two‑button, navy',
+                    price: 99.0,
                     preorders: [],
                     orders: [],
                 },
@@ -244,6 +249,10 @@ export class OrderService {
                     side_neck_point_to_upper_hip: 56.28,
                 },
             },
+            pricingData: {
+                currency: 'USD',
+                price: 99.0,
+            },
             deliveredAt: new Date('2025-07-14T12:00:00Z'),
             isPaid: true,
         }
@@ -263,7 +272,7 @@ export class OrderService {
         queueStatus: any
     }> {
         const id = order.id
-        const m = order.measurementData!
+        const m = order.measurementData
         const o = order.orderData
         const j = order.jacketData
 

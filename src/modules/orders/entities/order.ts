@@ -13,6 +13,7 @@ import { Item } from '../../items/entities/item'
 import { JacketData } from '../interfaces/jacket-data'
 import { MeasurementData } from '../interfaces/measurement-data'
 import { OrderData } from '../interfaces/order-data'
+import { PricingData } from '../interfaces/pricing-data'
 
 @Entity({ name: 'orders' })
 export class Order {
@@ -32,10 +33,13 @@ export class Order {
     @Column({ type: 'jsonb', name: 'jacket_data' })
     jacketData!: JacketData
 
-    @Column({ type: 'jsonb', name: 'measurement_data', nullable: true })
-    measurementData?: MeasurementData
+    @Column({ type: 'jsonb', name: 'measurement_data' })
+    measurementData!: MeasurementData
 
-    @CreateDateColumn({ type: 'timestamptz', name: 'delivered_at', nullable: true })
+    @Column({ type: 'jsonb', name: 'pricing_data' })
+    pricingData!: PricingData
+
+    @Column({ type: 'timestamptz', name: 'delivered_at', nullable: true })
     deliveredAt!: Date
 
     @Column({ type: 'boolean', name: 'is_paid', default: false })

@@ -18,6 +18,10 @@ export class PreorderService {
     }
 
     async create(itemIds: number[]): Promise<Preorder> {
+        if (itemIds.length === 0) {
+            throw new HttpError(400, 'No item IDs provided')
+        }
+
         const items = await this.itemRepo.find({
             where: { id: In(itemIds) },
         })
@@ -43,6 +47,7 @@ export class PreorderService {
         preorder.weight = data.weight
         preorder.frontImage = data.frontImage
         preorder.sideImage = data.sideImage
+        preorder.measurementData = data.measurementData
 
         return this.preorderRepo.save(preorder)
     }

@@ -1,5 +1,5 @@
 export interface CreatePaymentIntentInput {
     amount: number
     currency?: string
-    metadata?: Record<string, string>
+    orderId: number
 }
