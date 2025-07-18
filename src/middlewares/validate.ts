@@ -3,14 +3,17 @@ import { z } from 'zod'
 
 /**
  * Higher‑order middleware: takes a Zod schema and returns an Express handler
- * that will parse & validate req.body, then either:
- *  • attach `req.body = parsed` and call next()
- *  • respond 422 with a structured list of field errors
+ * that will parse & validate request data.
  */
 export const validate =
-    (schema: z.ZodTypeAny): RequestHandler =>
+    <T extends z.ZodTypeAny>(
+        schema: T,
+        target: 'body' | 'query' | 'params' = 'body'
+    ): RequestHandler =>
     (req, res, next) => {
-        const result = schema.safeParse(req.body)
+        const toValidate = req[target]
+        const result = schema.safeParse(toValidate)
+
         if (!result.success) {
             const errors = result.error.issues.map((issue) => ({
                 field: issue.path.join('.') || '(root)',
@@ -21,6 +24,7 @@ export const validate =
             return
         }
 
-        req.body = result.data
+        req[target] = result.data
+
         return next()
     }
