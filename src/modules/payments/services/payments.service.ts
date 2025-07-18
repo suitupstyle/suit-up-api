@@ -1,16 +1,17 @@
 import { HttpError } from '../../../utils/error'
 import { stripe } from '../../../utils/stripe'
-import { CreatePaymentIntentInput } from '../interfaces/create-payment-intent-input'
+import { CreatePaymentIntentDTO } from '../validations/create‑payment-intent.schema'
 
 export class PaymentService {
-    async createPaymentIntent(input: CreatePaymentIntentInput): Promise<string> {
+    async createPaymentIntent(input: CreatePaymentIntentDTO): Promise<string> {
         try {
             const intent = await stripe.paymentIntents.create({
                 amount: input.amount,
                 currency: input.currency ?? 'usd',
-                payment_method_types: ['card', 'alipay'],
+                payment_method: input.paymentMethodId,
+                confirm: true,
+                off_session: true,
                 metadata: {
-                    // order_id: 1,
                     order_id: input.orderId.toString(),
                 },
             })
@@ -19,6 +20,7 @@ export class PaymentService {
         } catch (err: any) {
             const message = err.raw?.message ?? err.message ?? 'PaymentIntent creation failed'
             const status = err.statusCode ?? 502
+
             throw new HttpError(status, message)
         }
     }

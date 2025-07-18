@@ -3,26 +3,31 @@ import env from '../../../config/env'
 import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
 import { ErrorResponse, SuccessResponse } from '../../../utils/response'
-import { generateOrder } from '../../orders/controllers/orders.controller'
-import { CreatePaymentIntentInput } from '../interfaces/create-payment-intent-input'
+import { OrderService } from '../../orders/services/orders.service'
 import { PaymentService } from '../services/payments.service'
+import { CreatePaymentIntentDTO } from '../validations/create‑payment-intent.schema'
 
 const service = new PaymentService()
+const orderService = new OrderService()
 
 export const createPaymentIntent: RequestHandler = async (
-    req: Request<{}, {}, CreatePaymentIntentInput>,
+    req: Request<{}, {}, CreatePaymentIntentDTO>,
     res: Response<SuccessResponse<{ clientSecret: string }> | ErrorResponse>,
     next: NextFunction
 ) => {
     try {
-        const { amount, currency, orderId } = req.body
-        if (!amount || amount <= 0) {
-            throw new HttpError(422, 'Invalid amount')
+        const data = req.body
+
+        const clientSecret = await service.createPaymentIntent(data)
+
+        const payload: SuccessResponse<{ clientSecret: string }> = {
+            data: { clientSecret },
         }
-        const clientSecret = await service.createPaymentIntent({ amount, currency, orderId })
-        res.status(201).json({ data: { clientSecret } })
+
+        res.status(201).json(payload)
+        return
     } catch (err: any) {
-        next(err)
+        return next(err)
     }
 }
 
@@ -40,7 +45,7 @@ export const handleWebhook: RequestHandler = async (
         }
         event = service.handleWebhookSignature(payload, sig, env.STRIPE_WEBHOOK_SECRET)
     } catch (err: any) {
-        next(err)
+        return next(err)
     }
 
     const eventType = event?.type
@@ -50,7 +55,7 @@ export const handleWebhook: RequestHandler = async (
             logger.info(`PaymentIntent succeeded: ${intent.id}`)
             logger.info(`Full metadata payload: ${JSON.stringify(intent.metadata)}`)
 
-            // const orderId = intent.metadata?.orderId
+            // const orderId = Number(intent.metadata?.orderId)
             const orderId = 1
             logger.info(`PaymentIntent metadata: ${JSON.stringify(intent.metadata)}`)
             if (!orderId) {
@@ -59,12 +64,11 @@ export const handleWebhook: RequestHandler = async (
             }
 
             try {
-                const fakeReq = { params: { id: orderId } } as unknown as Request
-                const fakeRes = {
-                    status: (_: number) => fakeRes,
-                    json: (_: any) => fakeRes,
-                } as unknown as Response
-                await generateOrder(fakeReq, fakeRes, next)
+                const order = await orderService.findByIdOrFail(orderId)
+
+                await orderService.markAsPaid(order)
+                await orderService.enqueueExcelGeneration(order)
+
                 logger.info(`Excel generated for order ${orderId}`)
             } catch (e) {
                 logger.error('Error generating order Excel:', e)

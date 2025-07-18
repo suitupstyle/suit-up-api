@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { validate } from '../../../middlewares/validate'
 import { verifyAppToken } from '../../../middlewares/verifyAppToken'
-import { createOrder, listOrders } from '../controllers/orders.controller'
+import { createOrder, wasPaidOrder, listOrders } from '../controllers/orders.controller'
 import { CreateOrderSchema } from '../validators/create‑order.schema'
 
 const router = Router()
@@ -40,7 +40,7 @@ const router = Router()
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/responses/ErrorResponse'
  */
 router.get('/', verifyAppToken, listOrders)
 
@@ -90,5 +90,47 @@ router.get('/', verifyAppToken, listOrders)
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/', validate(CreateOrderSchema), createOrder)
+
+/**
+ * @openapi
+ * /orders/{id}/is-paid:
+ *   get:
+ *     summary: Check if an order has been paid
+ *     tags:
+ *       - Orders
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Numeric ID of the order
+ *     responses:
+ *       200:
+ *         description: Returns whether the order is paid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: boolean
+ *                   description: true if paid, otherwise false
+ *               required:
+ *                 - data
+ *       404:
+ *         description: Order not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/ErrorResponse'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/responses/ErrorResponse'
+ */
+router.get('/:id/is-paid', wasPaidOrder)
 
 export default router
