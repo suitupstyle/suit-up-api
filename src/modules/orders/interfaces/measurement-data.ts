@@ -1,7 +1,7 @@
 export interface MeasurementData {
     id: number
     url: string
-    gender: string
+    gender: 'male' | 'female'
     height: number
     volume_params: VolumeParams
     front_params: FrontParams

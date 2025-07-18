@@ -34,7 +34,14 @@ export const measurePreorder: RequestHandler<{ id: string }, {}, MeasurePreorder
         const data = req.body
         const updated = await service.update(preorder!, data)
 
-        const measured = await service.measure(updated)
+        const measured = await service.measure({
+            ...updated,
+            gender: updated.gender!,
+            height: updated.height!,
+            weight: updated.weight!,
+            frontImage: updated.frontImage!,
+            sideImage: updated.sideImage!,
+        })
 
         const payload: SuccessResponse<Preorder> = {
             data: measured,

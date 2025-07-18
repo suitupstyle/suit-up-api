@@ -2,9 +2,7 @@ import { z } from 'zod'
 import { MeasurementDataSchema } from './measurement-data.schema'
 
 export const MeasurePreorderSchema = z.object({
-    gender: z.enum(['male', 'female']).refine((val) => ['male', 'female'].includes(val), {
-        message: '`gender` must be "male" or "female"',
-    }),
+    gender: z.enum(['male', 'female'], '`gender` must be "male" or "female"'),
     height: z
         .number()
         .int('`height` must be an integer')

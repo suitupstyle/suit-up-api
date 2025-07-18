@@ -8,10 +8,18 @@ import { CreateOrderDTO } from '../validators/create‑order.schema'
 
 const service = new OrderService()
 
-export const listOrders: RequestHandler = async (req, res, next) => {
+export const listOrders: RequestHandler<
+    {},
+    SuccessResponse<Order[]>,
+    any,
+    {
+        page?: string
+        limit?: string
+    }
+> = async (req, res, next) => {
     try {
-        const page = Math.max(1, parseInt((req.query.page as string) ?? '1', 10))
-        const limit = Math.max(1, parseInt((req.query.limit as string) ?? '20', 10))
+        const page = Math.max(1, parseInt(req.query.page ?? '1', 10))
+        const limit = Math.max(1, parseInt(req.query.limit ?? '20', 10))
 
         const { data, total } = await service.list(page, limit)
 
@@ -25,8 +33,9 @@ export const listOrders: RequestHandler = async (req, res, next) => {
         }
 
         res.status(200).json(payload)
+        return
     } catch (err: unknown) {
-        next(err)
+        return next(err)
     }
 }
 

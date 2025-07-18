@@ -150,8 +150,6 @@ export class OrderService {
                     orders: [],
                 },
             ],
-            frontImageUrl: 'https://example.com/uploads/front-42.jpg',
-            sideImageUrl: 'https://example.com/uploads/side-42.jpg',
             orderData: {
                 order_type: 'ABC',
                 quantity: 1,
@@ -255,7 +253,7 @@ export class OrderService {
             },
             deliveredAt: new Date('2025-07-14T12:00:00Z'),
             isPaid: true,
-        }
+        } satisfies Order
 
         if (!order) {
             throw new HttpError(404, 'Order not found')
