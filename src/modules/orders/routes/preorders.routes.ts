@@ -1,9 +1,13 @@
 import { Router } from 'express'
+import { validate } from '../../../middlewares/validate'
 import {
     createPreorder,
     measurePreorder,
     updatePreorder,
 } from '../controllers/preorders.controller'
+import { CreatePreorderSchema } from '../validators/create‑preorder.schema'
+import { MeasurePreorderSchema } from '../validators/measure‑preorder.schema'
+import { UpdatePreorderSchema } from '../validators/update‑preorder.schema'
 
 const router = Router()
 
@@ -44,7 +48,7 @@ const router = Router()
  *       500:
  *         description: Internal server error
  */
-router.post('/', createPreorder)
+router.post('/', validate(CreatePreorderSchema), createPreorder)
 
 /**
  * @openapi
@@ -93,63 +97,7 @@ router.post('/', createPreorder)
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post('/:id/measure', measurePreorder)
-
-/**
- * @openapi
- * /preorders:
- *   post:
- *     summary: Create a new preorder (items only)
- *     tags:
- *       - Preorders
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreatePreorderInput'
- *     responses:
- *       201:
- *         $ref: '#/components/responses/SuccessResponse_Preorder'
- *       422:
- *         $ref: '#/components/responses/ErrorResponse'
- *       500:
- *         $ref: '#/components/responses/ErrorResponse'
- */
-router.post('/', createPreorder)
-
-/**
- * @openapi
- * /preorders/{id}/measure:
- *   post:
- *     summary: Attach images & trigger 3DLOOK measurement
- *     tags:
- *       - Preorders
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *           format: uuid
- *         required: true
- *         description: Preorder UUID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/MeasurePreorderInput'
- *     responses:
- *       200:
- *         $ref: '#/components/responses/SuccessResponse_Preorder'
- *       400:
- *         $ref: '#/components/responses/ErrorResponse'
- *       404:
- *         $ref: '#/components/responses/ErrorResponse'
- *       502:
- *         $ref: '#/components/responses/ErrorResponse'
- */
-router.post('/:id/measure', measurePreorder)
+router.post('/:id/measure', validate(MeasurePreorderSchema), measurePreorder)
 
 /**
  * @openapi
@@ -180,6 +128,6 @@ router.post('/:id/measure', measurePreorder)
  *       404:
  *         $ref: '#/components/schemas/ErrorResponse'
  */
-router.put('/:id', updatePreorder)
+router.put('/:id', validate(UpdatePreorderSchema), updatePreorder)
 
 export default router

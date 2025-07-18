@@ -1,10 +1,10 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
     Column,
     CreateDateColumn,
-    ManyToMany,
+    Entity,
     JoinTable,
+    ManyToMany,
+    PrimaryGeneratedColumn,
 } from 'typeorm'
 import { Item } from '../../items/entities/item'
 import { MeasurementData } from '../interfaces/measurement-data'
@@ -18,7 +18,7 @@ export class Preorder {
     createdAt!: Date
 
     @Column({ type: 'varchar', length: 255, nullable: true })
-    gender?: string
+    gender?: 'male' | 'female'
 
     @Column({ type: 'integer', nullable: true })
     height?: number

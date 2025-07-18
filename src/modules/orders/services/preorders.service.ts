@@ -6,7 +6,8 @@ import { initSaia } from '../../../utils/saia'
 // import { urlToBase64 } from '../../../utils/url-to-base64'
 import { Item } from '../../items/entities/item'
 import { Preorder } from '../entities/preorder'
-import { MeasurePreorderInput } from '../interfaces/measure-preorder-input.interface'
+import { MeasurePreorderDTO } from '../validators/measure‑preorder.schema'
+import { UpdatePreorderDTO } from '../validators/update‑preorder.schema'
 
 export class PreorderService {
     private readonly preorderRepo: Repository<Preorder>
@@ -41,7 +42,7 @@ export class PreorderService {
         })
     }
 
-    async update(preorder: Preorder, data: MeasurePreorderInput): Promise<Preorder> {
+    async update(preorder: Preorder, data: UpdatePreorderDTO): Promise<Preorder> {
         preorder.gender = data.gender
         preorder.height = data.height
         preorder.weight = data.weight
@@ -52,8 +53,8 @@ export class PreorderService {
         return this.preorderRepo.save(preorder)
     }
 
-    async measure(preorder: Preorder): Promise<Preorder> {
-        const { gender, height, weight, frontImage, sideImage } = preorder
+    async measure(data: MeasurePreorderDTO): Promise<Preorder> {
+        const { gender, height, weight, frontImage, sideImage } = data
         if (!frontImage || !sideImage) {
             throw new HttpError(400, 'Image URLs not set on preorder')
         }
@@ -79,8 +80,8 @@ export class PreorderService {
                 throw new HttpError(504, '3DLOOK measurement error')
             }
 
-            preorder.measurementData = results
-            return this.preorderRepo.save(preorder)
+            data.measurementData = results
+            return this.preorderRepo.save(data)
         } catch (err: any) {
             logger.error('3DLOOK API error:', err.response?.data ?? err.message)
             if (err instanceof HttpError) throw err
