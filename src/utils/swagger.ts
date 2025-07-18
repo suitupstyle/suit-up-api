@@ -29,5 +29,10 @@ const swaggerOptions: Options = {
 export const swaggerSpec = swaggerJSDoc(swaggerOptions)
 
 export function setupSwagger(app: Application) {
+    app.get('/docs/swagger.json', (_req, res) => {
+        res.setHeader('Content-Type', 'application/json')
+        res.send(swaggerSpec)
+    })
+
     app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }))
 }
