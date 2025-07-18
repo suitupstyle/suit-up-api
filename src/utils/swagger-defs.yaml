@@ -11,7 +11,6 @@ components:
                     type: object
             required:
                 - data
-                -
         ErrorResponse:
             type: object
             properties:
@@ -390,3 +389,11 @@ components:
                 orderId:
                     type: integer
                     description: Internal order ID
+
+        SuccessResponse_Boolean:
+            allOf:
+                - $ref: '#/components/schemas/SuccessResponse'
+                - type: object
+                  properties:
+                      data:
+                          type: boolean

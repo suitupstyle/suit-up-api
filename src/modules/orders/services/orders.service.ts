@@ -326,4 +326,11 @@ export class OrderService {
             queueStatus: excelQueue.getStatus(),
         }
     }
+
+    async markAsPaid(order: Order) {
+        order.isPaid = true
+        order.deliveredAt = new Date()
+
+        return this.orderRepo.save(order)
+    }
 }

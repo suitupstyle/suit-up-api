@@ -50,19 +50,15 @@ export const createOrder: RequestHandler<{}, {}, CreateOrderDTO> = async (req, r
     }
 }
 
-export const generateOrder: RequestHandler = async (req, res, next) => {
-    // const id = parseInt(req.params.id, 10);
-    // if (isNaN(id)) {
-    //     return next(new HttpError(400, 'Invalid order ID'));
-    // }
-    const id = Math.floor(Math.random() * 100)
-
+export const wasPaidOrder: RequestHandler<{ id: number }, {}, any> = async (req, res, next) => {
     try {
-        const order = await service.findByIdOrFail(id)
-        const { outputFile, queueStatus } = await service.enqueueExcelGeneration(order)
-        res.json({ success: true, outputFile, queueStatus })
-    } catch (err) {
-        next(err)
+        const order = await service.findByIdOrFail(req.params.id)
+
+        const payload: SuccessResponse<boolean> = { data: order.isPaid }
+        res.status(201).json(payload)
+        return
+    } catch (err: unknown) {
+        return next(err)
     }
 }
 
