@@ -69,25 +69,25 @@ router.get('/', verifyAppToken, listOrders)
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/responses/ErrorResponse'
  *       404:
  *         description: Preorder not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/responses/ErrorResponse'
  *       422:
  *         description: Validation error
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/responses/ErrorResponse'
  *       502:
  *         description: External integration failure
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/responses/ErrorResponse'
  */
 router.post('/', validate(CreateOrderSchema), createOrder)
 

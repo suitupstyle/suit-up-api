@@ -44,7 +44,7 @@ const router = Router()
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/responses/ErrorResponse'
  *       500:
  *         description: Internal server error
  */
@@ -83,19 +83,19 @@ router.post('/', validate(CreatePreorderSchema), createPreorder)
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/responses/ErrorResponse'
  *       404:
  *         description: Preorder not found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/responses/ErrorResponse'
  *       502:
  *         description: 3DLOOK integration failed
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
+ *               $ref: '#/components/responses/ErrorResponse'
  */
 router.post('/:id/measure', validate(MeasurePreorderSchema), measurePreorder)
 
@@ -124,9 +124,9 @@ router.post('/:id/measure', validate(MeasurePreorderSchema), measurePreorder)
  *       200:
  *         $ref: '#/components/schemas/SuccessResponse_Preorder'
  *       400:
- *         $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/ErrorResponse'
  *       404:
- *         $ref: '#/components/schemas/ErrorResponse'
+ *         $ref: '#/components/responses/ErrorResponse'
  */
 router.put('/:id', validate(UpdatePreorderSchema), updatePreorder)
 
