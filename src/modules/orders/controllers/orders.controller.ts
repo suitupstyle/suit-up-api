@@ -79,7 +79,8 @@ export const generateExcelExample: RequestHandler = async (req, res, next) => {
             success: true,
             queueStatus: excelQueue.getStatus(), // <-- You can make a stream for this, or an endpoint to check it regularly
         })
+        return
     } catch (err) {
-        next(err)
+        return next(err)
     }
 }
