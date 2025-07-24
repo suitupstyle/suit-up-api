@@ -2,7 +2,7 @@ import { In, Repository } from 'typeorm'
 import { AppDataSource } from '../../../database/data-source'
 import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
-import { initSaia } from '../../../utils/saia'
+import { SAIA } from '../../../utils/saia'
 // import { urlToBase64 } from '../../../utils/url-to-base64'
 import { Item } from '../../items/entities/item'
 import { Preorder } from '../entities/preorder'
@@ -63,29 +63,39 @@ export class PreorderService {
             // Images already received as Base64 from the frontend!
             // const frontBase64 = await urlToBase64(frontImageUrl)
             // const sideBase64 = await urlToBase64(sideImageUrl)
-            const { person, queue } = await initSaia()
+            const saia = new SAIA()
 
-            const taskSetId = await person.create({
-                gender: gender!,
-                height: height!,
+            const result = await saia.createPerson({
+                gender: gender,
+                height: height,
                 weight: weight?.toFixed(1),
-                frontImage,
-                sideImage,
+                front_image: frontImage,
+                side_image: sideImage,
             })
 
-            const results = await queue.getResults(taskSetId)
+            let person
+            if ('task_set_id' in result) {
+                const taskSetId = result.task_set_id
+                const results = await saia.getQueueResults(taskSetId)
 
-            if (!results?.id) {
-                // Task was unsuccessful
-                throw new HttpError(504, '3DLOOK measurement error')
+                if (!results?.id) {
+                    throw new HttpError(504, '3DLOOK measurement error')
+                }
+
+                person = results
+            } else {
+                person = result.person
             }
 
-            data.measurementData = results
+            data.measurementData = person
             return this.preorderRepo.save(data)
         } catch (err: any) {
-            logger.error('3DLOOK API error:', err.response?.data ?? err.message)
+            logger.error('3DLOOK API error:', JSON.stringify(err))
             if (err instanceof HttpError) throw err
-            throw new HttpError(err.response?.status ?? 502, '3DLOOK integration failed')
+            throw new HttpError(
+                err.response?.status ?? 502,
+                `3DLOOK integration failed: ${err.message}`
+            )
         }
     }
 }
