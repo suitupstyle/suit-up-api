@@ -13,9 +13,8 @@ export const verifyAppToken: RequestHandler = (req, res, next) => {
         res.status(401).json({
             error: { message: 'Unauthorized: Invalid or missing application token.' },
         })
-
         return
     }
 
-    next()
+    return next()
 }

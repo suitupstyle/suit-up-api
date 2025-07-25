@@ -19,7 +19,7 @@ export const createPreorder: RequestHandler<{}, {}, CreatePreorderDTO> = async (
         res.status(201).json(payload)
         return
     } catch (err: unknown) {
-        next(err)
+        return next(err)
     }
 }
 
@@ -70,6 +70,7 @@ export const updatePreorder: RequestHandler<{ id: string }, {}, UpdatePreorderDT
         }
 
         res.status(200).json(payload)
+        return
     } catch (err: unknown) {
         return next(err)
     }

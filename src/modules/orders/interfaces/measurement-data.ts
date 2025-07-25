@@ -32,7 +32,7 @@ export interface VolumeParams {
 }
 
 export interface FrontParams {
-    soft_validation: SoftValidation
+    soft_validation?: SoftValidation
     body_height: number
     outseam: number
     outseam_from_upper_hip_level: number
@@ -49,6 +49,7 @@ export interface FrontParams {
     shoulders: number
     chest_top: number
     jacket_length: number
+    new_jacket_length: number
     shoulder_length: number
     neck: number
     waist: number
@@ -82,7 +83,7 @@ export interface FrontParams {
 }
 
 export interface SideParams {
-    soft_validation: SoftValidation
+    soft_validation?: SoftValidation
     neck_to_chest: number
     chest_to_waist: number
     waist_to_ankle: number
@@ -92,5 +93,5 @@ export interface SideParams {
 }
 
 export interface SoftValidation {
-    messages: string
+    messages: string[]
 }

@@ -23,6 +23,7 @@ interface EnvConfig {
     DATABASE_NAME: string
     MOCK_3DLOOK: boolean
     APP_TOKEN: string
+    TEMPLATE_FILE: string
 }
 
 const env: EnvConfig = {
@@ -32,7 +33,7 @@ const env: EnvConfig = {
     WINSTON_LOG_PATH: process.env.WINSTON_LOG_PATH ?? 'logs',
     API_BASE_URL: process.env.API_BASE_URL ?? 'http://localhost:3000',
     API_VERSION: process.env.API_VERSION ?? 'v1',
-    SAIA_API_HOST: process.env.SAIA_API_HOST ?? 'https://saia.3dlook.me/api/v2/',
+    SAIA_API_HOST: process.env.SAIA_API_HOST ?? 'https://saia.3dlook.me/api/v2',
     SAIA_API_KEY: process.env.SAIA_API_KEY ?? '',
     SUPABASE_URL: process.env.SUPABASE_URL ?? '',
     SUPABASE_KEY: process.env.SUPABASE_KEY ?? '',
@@ -46,6 +47,7 @@ const env: EnvConfig = {
     DATABASE_NAME: process.env.DATABASE_NAME ?? '',
     MOCK_3DLOOK: process.env.MOCK_3DLOOK === 'true',
     APP_TOKEN: process.env.APP_TOKEN ?? '',
+    TEMPLATE_FILE: process.env.TEMPLATE_FILE ?? 'order.xlsx',
 }
 
 for (const [key, value] of Object.entries(env)) {

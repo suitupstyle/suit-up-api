@@ -86,4 +86,5 @@ export const handleWebhook: RequestHandler = async (
     }
 
     res.json({ received: true })
+    return
 }
