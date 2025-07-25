@@ -1,4 +1,5 @@
 import { In, Repository } from 'typeorm'
+import env from "../../../config/env";
 import { AppDataSource } from '../../../database/data-source'
 import { ExcelGenerationJob } from '../../../types/definitions'
 import { HttpError } from '../../../utils/error'
@@ -152,7 +153,7 @@ export class OrderService {
 
         const sheetName = 'BOOKING'
         const job: ExcelGenerationJob = {
-            templatePath: './templates/order.xlsx',
+            templatePath: `./templates/${env.TEMPLATE_FILE}`,
             outputPath: `./output/order-${id}.xlsx`,
             updates: [
                 { sheetName, cellAddress: 'E2', value: o.order_type },

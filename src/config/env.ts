@@ -23,6 +23,7 @@ interface EnvConfig {
     DATABASE_NAME: string
     MOCK_3DLOOK: boolean
     APP_TOKEN: string
+    TEMPLATE_FILE: string
 }
 
 const env: EnvConfig = {
@@ -46,6 +47,7 @@ const env: EnvConfig = {
     DATABASE_NAME: process.env.DATABASE_NAME ?? '',
     MOCK_3DLOOK: process.env.MOCK_3DLOOK === 'true',
     APP_TOKEN: process.env.APP_TOKEN ?? '',
+    TEMPLATE_FILE: process.env.TEMPLATE_FILE ?? 'order.xlsx',
 }
 
 for (const [key, value] of Object.entries(env)) {
