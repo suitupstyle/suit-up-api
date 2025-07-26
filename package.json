@@ -1,0 +1,73 @@
+{
+    "name": "suit-up-api",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+        "build": "tsc",
+        "start": "node dist/server.js",
+        "lint": "eslint . --ext .ts",
+        "format": "prettier --write .",
+        "prepare": "husky install",
+        "commit": "git cz",
+        "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js",
+        "migration:generate": "ts-node-dev ./node_modules/typeorm/cli.js migration:generate -d src/database/data-source.ts -p src/database/migrations",
+        "migration:run": "pnpm typeorm migration:run",
+        "migration:revert": "pnpm typeorm migration:revert",
+        "db:create": "ts-node-dev ./node_modules/typeorm-extension/bin/cli.cjs db:create -d src/database/data-source.ts",
+        "db:drop": "ts-node-dev ./node_modules/typeorm-extension/bin/cli.cjs db:drop -d src/database/data-source.ts",
+        "seed:create": "ts-node-dev ./node_modules/typeorm-extension/bin/cli.cjs seed:create -d src/database/data-source.ts",
+        "seed:run": "ts-node-dev ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d src/database/data-source.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@3dlook/saia-sdk": "^2.17.0",
+        "@supabase/supabase-js": "^2.50.3",
+        "axios": "^1.10.0",
+        "cors": "^2.8.5",
+        "dotenv": "^17.0.1",
+        "exceljs": "^4.4.0",
+        "express": "^5.1.0",
+        "helmet": "^8.1.0",
+        "pg": "^8.16.3",
+        "raw-body": "^3.0.0",
+        "reflect-metadata": "^0.2.2",
+        "stripe": "^18.3.0",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.1",
+        "typeorm": "^0.3.25",
+        "typeorm-extension": "^3.7.1",
+        "winston": "^3.17.0",
+        "zod": "^4.0.5"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^19.8.1",
+        "@commitlint/config-conventional": "^19.8.1",
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.3",
+        "@types/node": "^24.0.10",
+        "@types/swagger-jsdoc": "^6.0.4",
+        "@types/swagger-ui-express": "^4.1.8",
+        "@typescript-eslint/eslint-plugin": "^8.35.1",
+        "@typescript-eslint/parser": "^8.35.1",
+        "axios-mock-adapter": "^2.1.0",
+        "commitizen": "^4.3.1",
+        "cz-conventional-changelog": "^3.3.0",
+        "eslint": "^9.30.1",
+        "eslint-config-prettier": "^10.1.5",
+        "eslint-plugin-import": "^2.32.0",
+        "husky": "^9.1.7",
+        "prettier": "^3.6.2",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.8.3"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
+    }
+}

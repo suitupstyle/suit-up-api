@@ -1,0 +1,26 @@
+name: Sync to Azure DevOps on PR
+on:
+    pull_request:
+        branches: [main, develop]
+        types: [closed] # <-- Only is activated once the PR is merged.
+
+jobs:
+    sync-repo:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout GitHub repo
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0 # <-- Clones all the history
+
+            - name: Configure Git for Azure DevOps
+              run: |
+                  git config --global user.name "GitHub Actions Sync"
+                  git config --global user.email "actions@github.com"
+                  git remote add azure https://dev.azure.com/NTSprint-SuitUp/SuitUp/_git/SuitUp-API
+
+            - name: Push to Azure DevOps
+              env:
+                  AZURE_DEVOPS_TOKEN: ${{ secrets.AZURE_DEVOPS_PAT }} # PAT @Armando284 Secrets
+              run: |
+                  git push --mirror https://$AZURE_DEVOPS_TOKEN@dev.azure.com/NTSprint-SuitUp/SuitUp/_git/SuitUp-API

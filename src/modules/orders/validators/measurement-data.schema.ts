@@ -1,0 +1,101 @@
+import { z } from 'zod'
+
+const SoftValidationSchema = z.object({
+  messages: z.array(z.string()).optional(), // * @reynierpsalas here now is an Array of strings and it can be undefined
+})
+
+const VolumeParamsSchema = z.object({
+  chest: z.number(),
+  waist: z.number(),
+  low_hips: z.number(),
+  high_hips: z.number(),
+  bicep: z.number(),
+  knee: z.number(),
+  ankle: z.number(),
+  wrist: z.number(),
+  calf: z.number(),
+  thigh: z.number(),
+  mid_thigh_girth: z.number(),
+  neck: z.number(),
+  forearm: z.number(),
+  neck_girth: z.number(),
+  neck_girth_relaxed: z.number(),
+  under_bust_girth: z.number(),
+  upper_chest_girth: z.number(),
+  elbow_girth: z.number(),
+  abdomen: z.number(),
+  armscye_girth: z.number(),
+})
+
+const FrontParamsSchema = z.object({
+  soft_validation: SoftValidationSchema,
+  body_height: z.number(),
+  outseam: z.number(),
+  outseam_from_upper_hip_level: z.number(),
+  inseam: z.number(),
+  inside_crotch_length_to_mid_thigh: z.number(),
+  inside_crotch_length_to_knee: z.number(),
+  inside_crotch_length_to_calf: z.number(),
+  crotch_length: z.number(),
+  sleeve_length: z.number(),
+  underarm_length: z.number(),
+  legs_distance: z.number(),
+  high_hips: z.number(),
+  hip_height: z.number(),
+  shoulders: z.number(),
+  chest_top: z.number(),
+  jacket_length: z.number().optional(), // * @reynierpsalas here I just added optional in case it comes in some response
+  new_jacket_length: z.number().optional(), // * @reynierpsalas this is the property that is actually coming on the response
+  shoulder_length: z.number(),
+  neck: z.number(),
+  waist: z.number(),
+  waist_to_low_hips: z.number(),
+  waist_to_knees: z.number(),
+  nape_to_waist_centre_back: z.number(),
+  bust_height: z.number(),
+  shoulder_slope: z.number(),
+  shoulder_to_waist: z.number(),
+  side_neck_point_to_armpit: z.number(),
+  back_neck_height: z.number(),
+  back_neck_point_to_wrist_length: z.number(),
+  upper_hip_height: z.number(),
+  waist_height: z.number(),
+  across_back_width: z.number(),
+  outer_ankle_height: z.number(),
+  knee_height: z.number(),
+  across_back_shoulder_width: z.number(),
+  total_crotch_length: z.number(),
+  inside_leg_height: z.number(),
+  neck_length: z.number(),
+  upper_arm_length: z.number(),
+  lower_arm_length: z.number(),
+  upper_hip_to_hip_length: z.number(),
+  back_shoulder_width: z.number(),
+  rise: z.number(),
+  back_neck_to_hip_length: z.number(),
+  torso_height: z.number(),
+  front_crotch_length: z.number(),
+  back_crotch_length: z.number(),
+})
+
+const SideParamsSchema = z.object({
+  soft_validation: SoftValidationSchema,
+  neck_to_chest: z.number(),
+  chest_to_waist: z.number(),
+  waist_to_ankle: z.number(),
+  shoulders_to_knees: z.number(),
+  side_upper_hip_level_to_knee: z.number(),
+  side_neck_point_to_upper_hip: z.number(),
+})
+
+export const MeasurementDataSchema = z.object({
+  id: z.number().int().positive(),
+  url: z.url(),
+  gender: z.enum(['male', 'female']),
+  height: z.number().int().positive(),
+  volume_params: VolumeParamsSchema,
+  front_params: FrontParamsSchema,
+  side_params: SideParamsSchema,
+})
+
+export type MeasurementDataDTO = z.infer<typeof MeasurementDataSchema>
