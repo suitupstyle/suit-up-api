@@ -2,10 +2,11 @@ import { In, Repository } from 'typeorm'
 import { AppDataSource } from '../../../database/data-source'
 import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
-import { SAIA } from '../../../utils/saia'
+import { saia } from '../../../utils/saia'
 // import { urlToBase64 } from '../../../utils/url-to-base64'
 import { Item } from '../../items/entities/item'
 import { Preorder } from '../entities/preorder'
+import { MeasurementData } from "../interfaces/measurement-data";
 import { MeasurePreorderDTO } from '../validators/measure‑preorder.schema'
 import { UpdatePreorderDTO } from '../validators/update‑preorder.schema'
 
@@ -48,7 +49,7 @@ export class PreorderService {
         preorder.weight = data.weight
         preorder.frontImage = data.frontImage
         preorder.sideImage = data.sideImage
-        preorder.measurementData = data.measurementData
+        preorder.measurementData = data.measurementData as unknown as MeasurementData
 
         return this.preorderRepo.save(preorder)
     }
@@ -63,8 +64,6 @@ export class PreorderService {
             // Images already received as Base64 from the frontend!
             // const frontBase64 = await urlToBase64(frontImageUrl)
             // const sideBase64 = await urlToBase64(sideImageUrl)
-            const saia = new SAIA()
-
             const result = await saia.createPerson({
                 gender: gender,
                 height: height,
