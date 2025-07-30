@@ -41,7 +41,7 @@ export interface GetPersonResponse {
     side_params: SideParams
 }
 
-export class SAIA {
+class SAIA {
     private readonly client: AxiosInstance
 
     constructor() {
@@ -166,3 +166,5 @@ export class SAIA {
         })
     }
 }
+
+export const saia = Object.freeze(new SAIA());
