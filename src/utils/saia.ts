@@ -58,7 +58,7 @@ class SAIA {
         data: CreatePersonRequest
     ): Promise<{ person: MeasurementData } | { task_set_id: string }> {
         try {
-            const resp = await this.client.post('/persons', data)
+            const resp = await this.client.post('/persons/', data)
 
             if (resp.status === 200) {
                 const person = resp.data.results[0]
@@ -77,14 +77,14 @@ class SAIA {
     }
 
     async getPerson(id: number): Promise<GetPersonResponse> {
-        const resp = await this.client.get<GetPersonResponse>(`/persons/${id}`)
+        const resp = await this.client.get<GetPersonResponse>(`/persons/${id}/`)
 
         return resp.data
     }
 
     async getTaskSet(id: string) {
         try {
-            const resp = await this.client.get(`/queue/${id}`)
+            const resp = await this.client.get(`/queue/${id}/`)
 
             return resp.data
         } catch (e) {
