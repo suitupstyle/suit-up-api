@@ -54,17 +54,9 @@ class SAIA {
         })
     }
 
-    async createPerson(
-        data: CreatePersonRequest
-    ): Promise<{ person: MeasurementData } | { task_set_id: string }> {
+    async createPerson(data: CreatePersonRequest): Promise<{ task_set_id: string }> {
         try {
             const resp = await this.client.post('/persons/', data)
-
-            if (resp.status === 200) {
-                const person = resp.data.results[0]
-
-                return { person }
-            }
 
             const taskSetUrl = resp.data.task_set_url
             const taskSetId = /\/queue\/(.*)\//g.exec(taskSetUrl)?.[1]!
@@ -136,7 +128,7 @@ class SAIA {
         })
     }
 
-    async getQueueResults(id: string, personId?: number): Promise<any> {
+    async getQueueResults(id: string, personId?: number): Promise<MeasurementData> {
         return new Promise((resolve, reject) => {
             this.checkQueueStatus(id)
                 .then((person) => {

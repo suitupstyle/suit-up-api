@@ -72,25 +72,15 @@ export class PreorderService {
                 side_image: sideImage,
             })
 
-            let person
-            if ('task_set_id' in result) {
-                const taskSetId = result.task_set_id
-                const results = await saia.getQueueResults(taskSetId)
+            const taskSetId = result.task_set_id
 
-                if (!results?.id) {
-                    throw new HttpError(504, '3DLOOK measurement error')
-                }
+            data.measurementData = await saia.getQueueResults(taskSetId)
 
-                person = results
-            } else {
-                person = result.person
-            }
-
-            data.measurementData = person
             return this.preorderRepo.save(data)
         } catch (err: any) {
-            logger.error('3DLOOK API error:', JSON.stringify(err))
-            if (err instanceof HttpError) throw err
+            if (err.status === 422)
+                throw new HttpError(422, 'One or both of the taken photos could not be processed.')
+
             throw new HttpError(
                 err.response?.status ?? 502,
                 `3DLOOK integration failed: ${err.message}`
