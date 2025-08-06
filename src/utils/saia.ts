@@ -8,6 +8,7 @@ import {
 } from '../modules/orders/interfaces/measurement-data'
 import { HttpError } from './error'
 import logger from './logger'
+import { setupSaiaMock } from "./setup-saia-mock";
 
 export interface CreatePersonRequest {
     gender: 'male' | 'female'
@@ -52,6 +53,10 @@ class SAIA {
                 'Content-Type': 'application/json',
             },
         })
+
+        if (env.MOCK_3DLOOK) {
+            setupSaiaMock(this.client)
+        }
     }
 
     async createPerson(data: CreatePersonRequest): Promise<{ task_set_id: string }> {
