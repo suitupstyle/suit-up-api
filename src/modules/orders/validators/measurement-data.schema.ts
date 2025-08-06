@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 const SoftValidationSchema = z.object({
-  messages: z.array(z.string()).optional(), // * @reynierpsalas here now is an Array of strings and it can be undefined
+  messages: z.array(z.string()).optional(),
 })
 
 const VolumeParamsSchema = z.object({
@@ -28,7 +28,7 @@ const VolumeParamsSchema = z.object({
 })
 
 const FrontParamsSchema = z.object({
-  soft_validation: SoftValidationSchema,
+  soft_validation: SoftValidationSchema.optional(),
   body_height: z.number(),
   outseam: z.number(),
   outseam_from_upper_hip_level: z.number(),
@@ -44,8 +44,8 @@ const FrontParamsSchema = z.object({
   hip_height: z.number(),
   shoulders: z.number(),
   chest_top: z.number(),
-  jacket_length: z.number().optional(), // * @reynierpsalas here I just added optional in case it comes in some response
-  new_jacket_length: z.number().optional(), // * @reynierpsalas this is the property that is actually coming on the response
+  jacket_length: z.number().optional(),
+  new_jacket_length: z.number().optional(),
   shoulder_length: z.number(),
   neck: z.number(),
   waist: z.number(),
@@ -79,7 +79,7 @@ const FrontParamsSchema = z.object({
 })
 
 const SideParamsSchema = z.object({
-  soft_validation: SoftValidationSchema,
+  soft_validation: SoftValidationSchema.optional(),
   neck_to_chest: z.number(),
   chest_to_waist: z.number(),
   waist_to_ankle: z.number(),
