@@ -15,18 +15,18 @@ const app: Application = express()
 
 app.use(helmet())
 app.use(
-  cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT'], // * @reynierpsalas I added PUT for the tests but if you need to add other methods just do it and tell me
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  })
+    cors({
+        origin: '*',
+        methods: ['GET', 'POST', 'PUT'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true,
+    })
 )
 
 app.post(
-  `/api/${env.API_VERSION}/payments/webhook`,
-  express.raw({ type: 'application/json' }),
-  handleWebhook
+    `/api/${env.API_VERSION}/payments/webhook`,
+    express.raw({ type: 'application/json' }),
+    handleWebhook
 )
 
 app.use(express.json({ limit: '10mb' }))
@@ -43,7 +43,7 @@ app.use(`/api/${env.API_VERSION}/orders`, ordersRouter)
 app.use(`/api/${env.API_VERSION}/payments`, paymentsRouter)
 
 app.use((_req, res) => {
-  res.status(404).json({ error: { message: 'Not Found' } })
+    res.status(404).json({ error: { message: 'Not Found' } })
 })
 
 app.use(errorHandler)

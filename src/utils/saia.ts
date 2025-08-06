@@ -104,17 +104,12 @@ class SAIA {
 
                     if (resp.is_ready && !resp.is_successful) {
                         clearInterval(timer)
-                        logger.error(
-                            'Check queue status error (by rps) (must display the reason)',
-                            JSON.stringify(resp)
-                        )
 
                         return reject(new Error('3DLOOK task failed'))
                     }
                 } catch (err: any) {
                     clearInterval(timer)
 
-                    logger.error('Check queue status error (by rps)', JSON.stringify(err))
                     return reject(
                         err instanceof HttpError
                             ? err
@@ -159,4 +154,4 @@ class SAIA {
     }
 }
 
-export const saia = Object.freeze(new SAIA());
+export const saia = Object.freeze(new SAIA())
