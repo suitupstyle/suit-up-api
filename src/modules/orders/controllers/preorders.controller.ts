@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express'
+import { HttpError } from '../../../utils/error'
 import { SuccessResponse } from '../../../utils/response'
 import { Preorder } from '../entities/preorder'
 import { PreorderService } from '../services/preorders.service'
@@ -49,7 +50,9 @@ export const measurePreorder: RequestHandler<{ id: string }, {}, MeasurePreorder
 
         res.status(200).json(payload)
         return
-    } catch (err: unknown) {
+    } catch (err: any) {
+        if (err.status === 422)
+            throw new HttpError(422, 'One or both of the taken photos could not be processed.')
         return next(err)
     }
 }

@@ -8,6 +8,7 @@ import {
 } from '../modules/orders/interfaces/measurement-data'
 import { HttpError } from './error'
 import logger from './logger'
+import { setupSaiaMock } from "./setup-saia-mock";
 
 export interface CreatePersonRequest {
     gender: 'male' | 'female'
@@ -41,7 +42,7 @@ export interface GetPersonResponse {
     side_params: SideParams
 }
 
-export class SAIA {
+class SAIA {
     private readonly client: AxiosInstance
 
     constructor() {
@@ -52,19 +53,15 @@ export class SAIA {
                 'Content-Type': 'application/json',
             },
         })
+
+        if (env.MOCK_3DLOOK) {
+            setupSaiaMock(this.client)
+        }
     }
 
-    async createPerson(
-        data: CreatePersonRequest
-    ): Promise<{ person: MeasurementData } | { task_set_id: string }> {
+    async createPerson(data: CreatePersonRequest): Promise<{ task_set_id: string }> {
         try {
-            const resp = await this.client.post('/persons', data)
-
-            if (resp.status === 200) {
-                const person = resp.data.results[0]
-
-                return { person }
-            }
+            const resp = await this.client.post('/persons/', data)
 
             const taskSetUrl = resp.data.task_set_url
             const taskSetId = /\/queue\/(.*)\//g.exec(taskSetUrl)?.[1]!
@@ -77,14 +74,14 @@ export class SAIA {
     }
 
     async getPerson(id: number): Promise<GetPersonResponse> {
-        const resp = await this.client.get<GetPersonResponse>(`/persons/${id}`)
+        const resp = await this.client.get<GetPersonResponse>(`/persons/${id}/`)
 
         return resp.data
     }
 
     async getTaskSet(id: string) {
         try {
-            const resp = await this.client.get(`/queue/${id}`)
+            const resp = await this.client.get(`/queue/${id}/`)
 
             return resp.data
         } catch (e) {
@@ -112,17 +109,12 @@ export class SAIA {
 
                     if (resp.is_ready && !resp.is_successful) {
                         clearInterval(timer)
-                        logger.error(
-                            'Check queue status error (by rps) (must display the reason)',
-                            JSON.stringify(resp)
-                        )
 
                         return reject(new Error('3DLOOK task failed'))
                     }
                 } catch (err: any) {
                     clearInterval(timer)
 
-                    logger.error('Check queue status error (by rps)', JSON.stringify(err))
                     return reject(
                         err instanceof HttpError
                             ? err
@@ -136,7 +128,7 @@ export class SAIA {
         })
     }
 
-    async getQueueResults(id: string, personId?: number): Promise<any> {
+    async getQueueResults(id: string, personId?: number): Promise<MeasurementData> {
         return new Promise((resolve, reject) => {
             this.checkQueueStatus(id)
                 .then((person) => {
@@ -166,3 +158,5 @@ export class SAIA {
         })
     }
 }
+
+export const saia = Object.freeze(new SAIA())

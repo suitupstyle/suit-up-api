@@ -1,11 +1,11 @@
 import { In, Repository } from 'typeorm'
 import { AppDataSource } from '../../../database/data-source'
 import { HttpError } from '../../../utils/error'
-import logger from '../../../utils/logger'
-import { SAIA } from '../../../utils/saia'
+import { saia } from '../../../utils/saia'
 // import { urlToBase64 } from '../../../utils/url-to-base64'
 import { Item } from '../../items/entities/item'
 import { Preorder } from '../entities/preorder'
+import { MeasurementData } from '../interfaces/measurement-data'
 import { MeasurePreorderDTO } from '../validators/measure‑preorder.schema'
 import { UpdatePreorderDTO } from '../validators/update‑preorder.schema'
 
@@ -48,7 +48,7 @@ export class PreorderService {
         preorder.weight = data.weight
         preorder.frontImage = data.frontImage
         preorder.sideImage = data.sideImage
-        preorder.measurementData = data.measurementData
+        preorder.measurementData = data.measurementData as unknown as MeasurementData
 
         return this.preorderRepo.save(preorder)
     }
@@ -63,8 +63,6 @@ export class PreorderService {
             // Images already received as Base64 from the frontend!
             // const frontBase64 = await urlToBase64(frontImageUrl)
             // const sideBase64 = await urlToBase64(sideImageUrl)
-            const saia = new SAIA()
-
             const result = await saia.createPerson({
                 gender: gender,
                 height: height,
@@ -73,25 +71,15 @@ export class PreorderService {
                 side_image: sideImage,
             })
 
-            let person
-            if ('task_set_id' in result) {
-                const taskSetId = result.task_set_id
-                const results = await saia.getQueueResults(taskSetId)
+            const taskSetId = result.task_set_id
 
-                if (!results?.id) {
-                    throw new HttpError(504, '3DLOOK measurement error')
-                }
+            data.measurementData = await saia.getQueueResults(taskSetId)
 
-                person = results
-            } else {
-                person = result.person
-            }
-
-            data.measurementData = person
             return this.preorderRepo.save(data)
         } catch (err: any) {
-            logger.error('3DLOOK API error:', JSON.stringify(err))
-            if (err instanceof HttpError) throw err
+            if (err.status === 422)
+                throw new HttpError(422, 'One or both of the taken photos could not be processed.')
+
             throw new HttpError(
                 err.response?.status ?? 502,
                 `3DLOOK integration failed: ${err.message}`

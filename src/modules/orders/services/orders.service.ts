@@ -1,5 +1,5 @@
 import { In, Repository } from 'typeorm'
-import env from "../../../config/env";
+import env from '../../../config/env'
 import { AppDataSource } from '../../../database/data-source'
 import { ExcelGenerationJob } from '../../../types/definitions'
 import { HttpError } from '../../../utils/error'
@@ -130,7 +130,7 @@ export class OrderService {
         const order = await this.orderRepo.findOne({
             where: { id },
             relations: ['customer'],
-        });
+        })
 
         if (!order) {
             throw new HttpError(404, 'Order not found')
