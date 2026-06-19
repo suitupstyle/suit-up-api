@@ -1,7 +1,14 @@
+import path from 'path'
 import { Application } from 'express'
 import swaggerJSDoc, { Options } from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 import env from '../config/env'
+
+const rootDir = process.cwd()
+const routeGlobs =
+    env.NODE_ENV === 'production'
+        ? [path.join(rootDir, 'dist/modules/**/*.js')]
+        : [path.join(rootDir, 'src/modules/**/*.ts')]
 
 const swaggerOptions: Options = {
     definition: {
@@ -22,8 +29,7 @@ const swaggerOptions: Options = {
         },
         security: [{ BearerAuth: [] }],
     },
-    // Point to all your route/controller files for JSDoc scanning:
-    apis: ['./src/modules/**/*.ts', './src/utils/swagger-defs.yaml'],
+    apis: [...routeGlobs, path.join(rootDir, 'src/utils/swagger-defs.yaml')],
 }
 
 export const swaggerSpec = swaggerJSDoc(swaggerOptions)
