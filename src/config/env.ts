@@ -12,7 +12,7 @@ interface EnvConfig {
     SAIA_API_HOST: string
     SAIA_API_KEY: string
     SUPABASE_URL: string
-    SUPABASE_KEY: string
+    SUPABASE_PUBLIC_API_KEY: string
     STRIPE_PUBLISHABLE_KEY: string
     STRIPE_SECRET_KEY: string
     STRIPE_WEBHOOK_SECRET: string
@@ -36,7 +36,7 @@ const env: EnvConfig = {
     SAIA_API_HOST: process.env.SAIA_API_HOST ?? 'https://saia.3dlook.me/api/v2',
     SAIA_API_KEY: process.env.SAIA_API_KEY ?? '',
     SUPABASE_URL: process.env.SUPABASE_URL ?? '',
-    SUPABASE_KEY: process.env.SUPABASE_KEY ?? '',
+    SUPABASE_PUBLIC_API_KEY: process.env.SUPABASE_PUBLIC_API_KEY ?? '',
     STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY ?? '',
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET ?? '',
