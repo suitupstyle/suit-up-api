@@ -1,0 +1,53 @@
+services:
+  - type: web
+    name: suit-up-api
+    runtime: node
+    plan: free
+    buildCommand: pnpm install --frozen-lockfile && pnpm run build
+    startCommand: pnpm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: '3000'
+      - key: HUSKY
+        value: '0'
+      - key: DATABASE_HOST
+        sync: false
+      - key: DATABASE_PORT
+        sync: false
+      - key: DATABASE_USER
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: DATABASE_NAME
+        sync: false
+      - key: WINSTON_LOG_LEVEL
+        value: info
+      - key: WINSTON_LOG_PATH
+        value: logs
+      - key: API_VERSION
+        value: v1
+      - key: SAIA_API_HOST
+        value: https://saia.3dlook.me/api/v2
+      - key: MOCK_3DLOOK
+        value: 'false'
+      - key: TEMPLATE_FILE
+        value: order.xlsx
+      - key: API_BASE_URL
+        sync: false
+      - key: SAIA_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLIC_API_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: APP_TOKEN
+        sync: false
