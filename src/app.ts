@@ -32,6 +32,10 @@ app.post(
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ limit: '10mb', extended: true }))
 
+app.get('/health', (_req, res) => {
+    res.status(200).json({ status: 'ok' })
+})
+
 setupSwagger(app)
 
 // TODO: Protect all routes!
