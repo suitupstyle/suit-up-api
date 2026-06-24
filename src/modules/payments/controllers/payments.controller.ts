@@ -10,6 +10,9 @@ import { CreatePaymentIntentDTO } from '../validations/create‑payment-intent.s
 const service = new PaymentService()
 const orderService = new OrderService()
 
+// ---------------------------------------------------------------------------
+// Payment Intent flow
+// ---------------------------------------------------------------------------
 export const createPaymentIntent: RequestHandler = async (
     req: Request<{}, {}, CreatePaymentIntentDTO>,
     res: Response<SuccessResponse<{ clientSecret: string }> | ErrorResponse>,
@@ -19,6 +22,30 @@ export const createPaymentIntent: RequestHandler = async (
         const data = req.body
 
         const clientSecret = await service.createPaymentIntent(data)
+
+        const payload: SuccessResponse<{ clientSecret: string }> = {
+            data: { clientSecret },
+        }
+
+        res.status(201).json(payload)
+        return
+    } catch (err: any) {
+        return next(err)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Checkout Session flow (kept for potential future use)
+// ---------------------------------------------------------------------------
+export const createCheckoutSession: RequestHandler = async (
+    req: Request<{}, {}, CreatePaymentIntentDTO>,
+    res: Response<SuccessResponse<{ clientSecret: string }> | ErrorResponse>,
+    next: NextFunction
+) => {
+    try {
+        const data = req.body
+
+        const clientSecret = await service.createCheckoutSession(data)
 
         const payload: SuccessResponse<{ clientSecret: string }> = {
             data: { clientSecret },
@@ -50,16 +77,56 @@ export const handleWebhook: RequestHandler = async (
 
     const eventType = event?.type
     switch (eventType) {
+        // ------------------------------------------------------------------
+        // Payment Intent events
+        // ------------------------------------------------------------------
         case 'payment_intent.succeeded': {
-            const intent = event.data.object
-            logger.info(`PaymentIntent succeeded: ${intent.id}`)
-            logger.info(`Full metadata payload: ${JSON.stringify(intent.metadata)}`)
+            const paymentIntent = event.data.object
+            logger.info(`PaymentIntent succeeded: ${paymentIntent.id}`)
 
-            // const orderId = Number(intent.metadata?.orderId)
-            const orderId = 1
-            logger.info(`PaymentIntent metadata: ${JSON.stringify(intent.metadata)}`)
+            const orderId = Number(paymentIntent.metadata?.order_id)
             if (!orderId) {
                 logger.error('No orderId in PaymentIntent metadata, skipping Excel generation')
+                break
+            }
+
+            try {
+                const order = await orderService.findByIdOrFail(orderId)
+
+                await orderService.markAsPaid(order)
+                await orderService.enqueueExcelGeneration(order)
+
+                logger.info(`Excel generated for order ${orderId}`)
+            } catch (e) {
+                logger.error('Error processing payment_intent.succeeded:', e)
+            }
+
+            break
+        }
+        case 'payment_intent.payment_failed': {
+            const paymentIntent = event.data.object
+            logger.error(
+                `PaymentIntent payment failed: ${paymentIntent.id} — ${paymentIntent.last_payment_error?.message}`
+            )
+            break
+        }
+
+        // ------------------------------------------------------------------
+        // Checkout Session events (kept for potential future use)
+        // ------------------------------------------------------------------
+        case 'checkout.session.completed': {
+            const session = event.data.object
+            logger.info(`Checkout session completed: ${session.id}`)
+            logger.info(`Full metadata payload: ${JSON.stringify(session.metadata)}`)
+
+            const orderId = Number(session.metadata?.order_id)
+            if (!orderId) {
+                logger.error('No orderId in session metadata, skipping Excel generation')
+                break
+            }
+
+            if (session.payment_status !== 'paid') {
+                logger.info(`Session ${session.id} not yet paid (status: ${session.payment_status}), skipping`)
                 break
             }
 
@@ -76,9 +143,9 @@ export const handleWebhook: RequestHandler = async (
 
             break
         }
-        case 'payment_intent.payment_failed': {
-            const failure = event.data.object
-            logger.error(`Payment failed: ${failure.last_payment_error?.message}`)
+        case 'checkout.session.async_payment_failed': {
+            const session = event.data.object
+            logger.error(`Checkout session async payment failed: ${session.id}`)
             break
         }
         default:

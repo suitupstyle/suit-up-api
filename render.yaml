@@ -39,11 +39,13 @@ services:
         sync: false
       - key: SAIA_API_KEY
         sync: false
+      - key: FRONTEND_BASE_URL
+        sync: false
       - key: SUPABASE_URL
         sync: false
-      - key: SUPABASE_PUBLIC_API_KEY
+      - key: SUPABASE_PUBLISHABLE_KEY
         sync: false
-      - key: STRIPE_PUBLISHABLE_KEY
+      - key: SUPABASE_SECRET_KEY
         sync: false
       - key: STRIPE_SECRET_KEY
         sync: false

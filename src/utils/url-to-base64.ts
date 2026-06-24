@@ -6,7 +6,7 @@ export async function urlToBase64(url: string): Promise<string> {
         responseType: 'arraybuffer',
     })
 
-    const mimeType = response.headers['content-type'] ?? 'application/octet-stream'
+    const mimeType = String(response.headers['content-type'] ?? 'application/octet-stream')
 
     const blob = new Blob([response.data], { type: mimeType })
 
