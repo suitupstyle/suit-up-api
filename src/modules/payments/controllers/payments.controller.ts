@@ -55,9 +55,7 @@ export const handleWebhook: RequestHandler = async (
             logger.info(`PaymentIntent succeeded: ${intent.id}`)
             logger.info(`Full metadata payload: ${JSON.stringify(intent.metadata)}`)
 
-            // const orderId = Number(intent.metadata?.orderId)
-            const orderId = 1
-            logger.info(`PaymentIntent metadata: ${JSON.stringify(intent.metadata)}`)
+            const orderId = Number(intent.metadata?.order_id)
             if (!orderId) {
                 logger.error('No orderId in PaymentIntent metadata, skipping Excel generation')
                 break

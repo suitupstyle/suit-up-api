@@ -8,9 +8,7 @@ export class PaymentService {
             const intent = await stripe.paymentIntents.create({
                 amount: input.amount,
                 currency: input.currency ?? 'usd',
-                payment_method: input.paymentMethodId,
-                confirm: true,
-                off_session: true,
+                automatic_payment_methods: { enabled: true },
                 metadata: {
                     order_id: input.orderId.toString(),
                 },
