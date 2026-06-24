@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validate } from '../../../middlewares/validate'
-import { createPaymentIntent } from '../controllers/payments.controller'
+import { createCheckoutSession } from '../controllers/payments.controller'
 import { CreatePaymentIntentSchema } from '../validations/create‑payment-intent.schema'
 
 const router = Router()
@@ -37,6 +37,6 @@ const router = Router()
  *       '500':
  *         $ref: '#/components/responses/ErrorResponse'
  */
-router.post('/create-intent', validate(CreatePaymentIntentSchema), createPaymentIntent)
+router.post('/create-intent', validate(CreatePaymentIntentSchema), createCheckoutSession)
 
 export default router
