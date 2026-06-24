@@ -23,7 +23,7 @@ export class PaymentService {
                 },
             })
 
-            return session.client_secret!
+            return decodeURIComponent(session.client_secret!)
         } catch (err: any) {
             const message = err.raw?.message ?? err.message ?? 'Checkout session creation failed'
             const status = err.statusCode ?? 502
