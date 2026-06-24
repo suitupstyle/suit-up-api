@@ -13,6 +13,7 @@ interface EnvConfig {
     SAIA_API_KEY: string
     SUPABASE_URL: string
     SUPABASE_PUBLIC_API_KEY: string
+    SUPABASE_SERVICE_ROLE_KEY: string
     STRIPE_PUBLISHABLE_KEY: string
     STRIPE_SECRET_KEY: string
     STRIPE_WEBHOOK_SECRET: string
@@ -37,6 +38,7 @@ const env: EnvConfig = {
     SAIA_API_KEY: process.env.SAIA_API_KEY ?? '',
     SUPABASE_URL: process.env.SUPABASE_URL ?? '',
     SUPABASE_PUBLIC_API_KEY: process.env.SUPABASE_PUBLIC_API_KEY ?? '',
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
     STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY ?? '',
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET ?? '',

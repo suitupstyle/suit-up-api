@@ -4,7 +4,7 @@ import { AppDataSource } from '../../../database/data-source'
 import { ExcelGenerationJob } from '../../../types/definitions'
 import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
-import { supabase } from '../../../utils/supabase'
+import { supabaseAdmin } from '../../../utils/supabase'
 import { ListResult } from '../../common/interfaces/list-result.interface'
 import { Customer } from '../../customers/entities/customer'
 import { Item } from '../../items/entities/item'
@@ -73,28 +73,35 @@ export class OrderService {
             where: { email: customerEmail },
         })
 
-        try {
-            if (!customer) {
-                const { data, error } = await supabase.auth.admin.createUser({
-                    email: customerEmail,
-                    password: customerPassword,
-                    email_confirm: true,
-                    user_metadata: {
-                        name: customerName,
-                        role: 'customer',
-                    },
-                })
-                if (error || !data?.user?.id) {
-                    throw new HttpError(502, 'Customer could not be created')
-                }
+        if (!customer) {
+            const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+                email: customerEmail,
+                password: customerPassword,
+                email_confirm: true,
+                user_metadata: {
+                    name: customerName,
+                    role: 'customer',
+                },
+            })
+            if (authError || !authData?.user?.id) {
+                logger.error('Supabase Auth createUser error:', authError?.message)
+                throw new HttpError(502, `Failed to create customer auth account: ${authError?.message ?? 'unknown error'}`)
+            }
+
+            try {
                 customer = this.customerRepo.create({
                     name: customerName,
                     email: customerEmail,
-                    supabaseUserId: data.user.id,
+                    supabaseUserId: authData.user.id,
                 })
                 await this.customerRepo.save(customer)
+            } catch (err: any) {
+                logger.error('Customer DB save error:', err.message)
+                throw new HttpError(500, 'Customer was created in Auth but could not be saved to the database')
             }
+        }
 
+        try {
             const order = this.orderRepo.create({
                 orderData: {
                     order_type: orderType ?? 'ABC',
@@ -121,8 +128,8 @@ export class OrderService {
 
             return saved
         } catch (err: any) {
-            logger.error('Create order error:', err.response?.data ?? err.message)
-            throw new HttpError(err.response?.status ?? 502, '3DLOOK integration failed')
+            logger.error('Order creation error:', err.message)
+            throw new HttpError(500, 'Failed to create the order')
         }
     }
 
