@@ -1,4 +1,5 @@
 import { HttpError } from '../../../utils/error'
+import logger from "../../../utils/logger";
 import { stripe } from '../../../utils/stripe'
 import { CreatePaymentIntentDTO } from '../validations/create‑payment-intent.schema'
 
@@ -23,6 +24,8 @@ export class PaymentService {
                 },
             })
 
+            logger.info(`Checkout session created. Client Secret: ${session.client_secret}`)
+            logger.info(`Checkout session created. Client Secret (decoded): ${decodeURIComponent(session.client_secret!)}`)
             return decodeURIComponent(session.client_secret!)
         } catch (err: any) {
             const message = err.raw?.message ?? err.message ?? 'Checkout session creation failed'
