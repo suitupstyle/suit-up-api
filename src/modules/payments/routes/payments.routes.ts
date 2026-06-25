@@ -7,9 +7,9 @@ const router = Router()
 
 /**
  * @openapi
- * /payments/create-intent:
+ * /payments/create-checkout-session:
  *   post:
- *     summary: Create a new Stripe PaymentIntent
+ *     summary: Create a new Stripe Checkout Session
  *     tags:
  *       - Payments
  *     requestBody:
@@ -37,6 +37,6 @@ const router = Router()
  *       '500':
  *         $ref: '#/components/responses/ErrorResponse'
  */
-router.post('/create-intent', validate(CreatePaymentIntentSchema), createCheckoutSession)
+router.post('/create-checkout-session', validate(CreatePaymentIntentSchema), createCheckoutSession)
 
 export default router

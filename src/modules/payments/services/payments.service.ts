@@ -1,3 +1,4 @@
+import env from '../../../config/env'
 import { HttpError } from '../../../utils/error'
 import logger from "../../../utils/logger";
 import { stripe } from '../../../utils/stripe'
@@ -7,8 +8,9 @@ export class PaymentService {
     async createCheckoutSession(input: CreatePaymentIntentDTO): Promise<string> {
         try {
             const session = await stripe.checkout.sessions.create({
-                ui_mode: 'elements',
+                ui_mode: 'embedded_page',
                 mode: 'payment',
+                return_url: `${env.API_BASE_URL}/orders/payment-confirmation?session_id={CHECKOUT_SESSION_ID}`,
                 line_items: [
                     {
                         price_data: {
@@ -24,9 +26,7 @@ export class PaymentService {
                 },
             })
 
-            logger.info(`Checkout session created. Client Secret: ${session.client_secret}`)
-            logger.info(`Checkout session created. Client Secret (decoded): ${decodeURIComponent(session.client_secret!)}`)
-            return decodeURIComponent(session.client_secret!)
+            return session.client_secret!;
         } catch (err: any) {
             const message = err.raw?.message ?? err.message ?? 'Checkout session creation failed'
             const status = err.statusCode ?? 502
