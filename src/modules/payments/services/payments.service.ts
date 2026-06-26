@@ -10,7 +10,7 @@ export class PaymentService {
             const session = await stripe.checkout.sessions.create({
                 ui_mode: 'embedded_page',
                 mode: 'payment',
-                return_url: `${env.API_BASE_URL}/orders/payment-confirmation?session_id={CHECKOUT_SESSION_ID}`,
+                return_url: `${env.FRONTEND_BASE_URL}/orders/payment-confirmation?session_id={CHECKOUT_SESSION_ID}`,
                 line_items: [
                     {
                         price_data: {
