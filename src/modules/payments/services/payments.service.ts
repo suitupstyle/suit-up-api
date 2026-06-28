@@ -5,6 +5,33 @@ import { stripe } from '../../../utils/stripe'
 import { CreatePaymentIntentDTO } from '../validations/create‑payment-intent.schema'
 
 export class PaymentService {
+    // ---------------------------------------------------------------------------
+    // Payment Intent flow
+    // ---------------------------------------------------------------------------
+    async createPaymentIntent(input: CreatePaymentIntentDTO): Promise<string> {
+        try {
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: input.amount,
+                currency: input.currency ?? 'usd',
+                metadata: {
+                    order_id: input.orderId.toString(),
+                },
+                // Omitting payment_method_types enables dynamic payment methods
+                // (Stripe auto-selects based on currency, location, amount, etc.)
+            })
+
+            return paymentIntent.client_secret!
+        } catch (err: any) {
+            const message = err.raw?.message ?? err.message ?? 'PaymentIntent creation failed'
+            const status = err.statusCode ?? 502
+
+            throw new HttpError(status, message)
+        }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Checkout Session flow (kept for potential future use)
+    // ---------------------------------------------------------------------------
     async createCheckoutSession(input: CreatePaymentIntentDTO): Promise<string> {
         try {
             const session = await stripe.checkout.sessions.create({
