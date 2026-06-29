@@ -218,9 +218,16 @@ export class OrderService {
     }
 
     async markAsPaid(order: Order) {
+        if (order.isPaid) {
+            logger.info(`Order ${order.id} already marked as paid, skipping`)
+            return false // signals "already done"
+        }
+
         order.isPaid = true
         order.deliveredAt = new Date()
 
-        return this.orderRepo.save(order)
+        await this.orderRepo.save(order)
+
+        return true
     }
 }

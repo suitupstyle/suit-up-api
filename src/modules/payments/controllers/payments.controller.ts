@@ -93,8 +93,10 @@ export const handleWebhook: RequestHandler = async (
             try {
                 const order = await orderService.findByIdOrFail(orderId)
 
-                await orderService.markAsPaid(order)
-                await orderService.enqueueExcelGeneration(order)
+                const wasPaid = await orderService.markAsPaid(order)
+                if (wasPaid) {
+                    await orderService.enqueueExcelGeneration(order)
+                }
 
                 logger.info(`Excel generated for order ${orderId}`)
             } catch (e) {
@@ -111,43 +113,6 @@ export const handleWebhook: RequestHandler = async (
             break
         }
 
-        // ------------------------------------------------------------------
-        // Checkout Session events (kept for potential future use)
-        // ------------------------------------------------------------------
-        case 'checkout.session.completed': {
-            const session = event.data.object
-            logger.info(`Checkout session completed: ${session.id}`)
-            logger.info(`Full metadata payload: ${JSON.stringify(session.metadata)}`)
-
-            const orderId = Number(session.metadata?.order_id)
-            if (!orderId) {
-                logger.error('No orderId in session metadata, skipping Excel generation')
-                break
-            }
-
-            if (session.payment_status !== 'paid') {
-                logger.info(`Session ${session.id} not yet paid (status: ${session.payment_status}), skipping`)
-                break
-            }
-
-            try {
-                const order = await orderService.findByIdOrFail(orderId)
-
-                await orderService.markAsPaid(order)
-                await orderService.enqueueExcelGeneration(order)
-
-                logger.info(`Excel generated for order ${orderId}`)
-            } catch (e) {
-                logger.error('Error generating order Excel:', e)
-            }
-
-            break
-        }
-        case 'checkout.session.async_payment_failed': {
-            const session = event.data.object
-            logger.error(`Checkout session async payment failed: ${session.id}`)
-            break
-        }
         default:
             logger.info(`Unhandled event type ${eventType}`)
     }
