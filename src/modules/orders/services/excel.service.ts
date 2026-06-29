@@ -1,5 +1,6 @@
 import ExcelJS, { type CellValue } from 'exceljs'
 import { type ExcelCellUpdate, type ExcelGenerationJob } from '../../../types/definitions'
+import logger from '../../../utils/logger'
 
 /**
  * Handles low-level Excel file operations
@@ -13,17 +14,17 @@ export class ExcelService {
      * @throws Error when file operations fail
      */
     async generateFromTemplate(job: ExcelGenerationJob): Promise<Buffer> {
-        // #region agent log H-B/H-C: memory before readFile
+        // #region agent log H-B/H-C
         const memBefore = process.memoryUsage()
-        fetch('http://127.0.0.1:7863/ingest/f1df4b2f-bd4e-4cb9-bf44-4adbe45acdc4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e3f027'},body:JSON.stringify({sessionId:'e3f027',hypothesisId:'H-B/H-C',location:'excel.service.ts:before-readFile',message:'heap before readFile',data:{templatePath:job.templatePath,heapUsedMB:Math.round(memBefore.heapUsed/1024/1024),heapTotalMB:Math.round(memBefore.heapTotal/1024/1024),rssMB:Math.round(memBefore.rss/1024/1024)},timestamp:Date.now()})}).catch(()=>{});
+        logger.info('[dbg:e3f027] before-readFile', { hyp: 'H-B/H-C', templatePath: job.templatePath, heapUsedMB: Math.round(memBefore.heapUsed/1024/1024), heapTotalMB: Math.round(memBefore.heapTotal/1024/1024), rssMB: Math.round(memBefore.rss/1024/1024) })
         // #endregion
 
         const workbook = new ExcelJS.Workbook()
         await workbook.xlsx.readFile(job.templatePath)
 
-        // #region agent log H-B: memory after readFile
+        // #region agent log H-B
         const memAfterRead = process.memoryUsage()
-        fetch('http://127.0.0.1:7863/ingest/f1df4b2f-bd4e-4cb9-bf44-4adbe45acdc4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e3f027'},body:JSON.stringify({sessionId:'e3f027',hypothesisId:'H-B',location:'excel.service.ts:after-readFile',message:'heap after readFile',data:{heapUsedMB:Math.round(memAfterRead.heapUsed/1024/1024),heapTotalMB:Math.round(memAfterRead.heapTotal/1024/1024),rssMB:Math.round(memAfterRead.rss/1024/1024),deltaHeapMB:Math.round((memAfterRead.heapUsed-memBefore.heapUsed)/1024/1024)},timestamp:Date.now()})}).catch(()=>{});
+        logger.info('[dbg:e3f027] after-readFile', { hyp: 'H-B', heapUsedMB: Math.round(memAfterRead.heapUsed/1024/1024), heapTotalMB: Math.round(memAfterRead.heapTotal/1024/1024), rssMB: Math.round(memAfterRead.rss/1024/1024), deltaHeapMB: Math.round((memAfterRead.heapUsed-memBefore.heapUsed)/1024/1024) })
         // #endregion
 
         if (Array.isArray(job.updates)) {
@@ -34,9 +35,9 @@ export class ExcelService {
 
         const buf = await workbook.xlsx.writeBuffer() as unknown as Buffer
 
-        // #region agent log H-E: memory after writeBuffer + buffer size
+        // #region agent log H-E
         const memAfterWrite = process.memoryUsage()
-        fetch('http://127.0.0.1:7863/ingest/f1df4b2f-bd4e-4cb9-bf44-4adbe45acdc4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e3f027'},body:JSON.stringify({sessionId:'e3f027',hypothesisId:'H-E',location:'excel.service.ts:after-writeBuffer',message:'heap after writeBuffer',data:{heapUsedMB:Math.round(memAfterWrite.heapUsed/1024/1024),heapTotalMB:Math.round(memAfterWrite.heapTotal/1024/1024),rssMB:Math.round(memAfterWrite.rss/1024/1024),bufferSizeKB:Math.round(buf.length/1024)},timestamp:Date.now()})}).catch(()=>{});
+        logger.info('[dbg:e3f027] after-writeBuffer', { hyp: 'H-E', heapUsedMB: Math.round(memAfterWrite.heapUsed/1024/1024), heapTotalMB: Math.round(memAfterWrite.heapTotal/1024/1024), rssMB: Math.round(memAfterWrite.rss/1024/1024), bufferSizeKB: Math.round(buf.length/1024) })
         // #endregion
 
         return buf
