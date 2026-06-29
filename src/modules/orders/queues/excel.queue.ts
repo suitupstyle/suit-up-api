@@ -22,6 +22,9 @@ class ExcelQueue {
      */
     async addJob(job: ExcelGenerationJob): Promise<void> {
         this.queue.push(job)
+        // #region agent log H-D: concurrent job detection
+        fetch('http://127.0.0.1:7863/ingest/f1df4b2f-bd4e-4cb9-bf44-4adbe45acdc4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'e3f027'},body:JSON.stringify({sessionId:'e3f027',hypothesisId:'H-D',location:'excel.queue.ts:addJob',message:'job enqueued',data:{queueLength:this.queue.length,isProcessing:this.isProcessing,orderId:job.metadata?.orderId},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         if (!this.isProcessing) {
             this.processQueue()
         }
