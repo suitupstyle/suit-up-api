@@ -22,7 +22,7 @@ export class ExcelService {
             this.applyBulkUpdates(workbook, job.updates)
         }
 
-        return Buffer.from(await workbook.xlsx.writeBuffer())
+        return await workbook.xlsx.writeBuffer() as unknown as Promise<Buffer>
     }
 
     /**
