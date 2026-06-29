@@ -45,6 +45,9 @@ export class Order {
     @Column({ type: 'boolean', name: 'is_paid', default: false })
     isPaid: boolean = false
 
+    @Column({ type: 'text', name: 'excel_url', nullable: true })
+    excelUrl: string | null = null
+
     @ManyToMany(() => Item, (item) => item.orders, {
         cascade: true,
     })

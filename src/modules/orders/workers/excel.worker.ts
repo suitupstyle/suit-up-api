@@ -1,6 +1,8 @@
 import { ExcelService } from '../services/excel.service'
 import { type ExcelGenerationJob } from '../../../types/definitions'
 import { supabaseAdmin } from '../../../utils/supabase'
+import { AppDataSource } from '../../../database/data-source'
+import { Order } from '../entities/order'
 import logger from '../../../utils/logger'
 
 const XLSX_CONTENT_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -12,8 +14,8 @@ export class ExcelWorker {
     constructor(private readonly excelService: ExcelService) {}
 
     /**
-     * Executes a single Excel generation job: generates the workbook in memory
-     * and uploads it to Supabase Storage (no local disk writes).
+     * Executes a single Excel generation job: generates the workbook in memory,
+     * uploads it to Supabase Storage, and persists the public URL on the Order record.
      * @param job - Job to process
      */
     async processJob(job: ExcelGenerationJob): Promise<void> {
@@ -47,5 +49,19 @@ export class ExcelWorker {
         // #endregion
 
         logger.info(`Successfully uploaded to Supabase Storage: ${job.storageBucket}/${job.storageKey}`)
+
+        const orderId = job.metadata?.orderId as number | undefined
+        if (orderId) {
+            const { data: urlData } = supabaseAdmin.storage
+                .from(job.storageBucket)
+                .getPublicUrl(job.storageKey)
+
+            const orderRepo = AppDataSource.getRepository(Order)
+            await orderRepo.update(orderId, { excelUrl: urlData.publicUrl })
+
+            // #region agent log H-F: verify URL saved to order
+            logger.info(`[dbg:e3f027] excelUrl saved orderId=${orderId} url=${urlData.publicUrl}`)
+            // #endregion
+        }
     }
 }
