@@ -25,6 +25,7 @@ interface EnvConfig {
     MOCK_3DLOOK: boolean
     APP_TOKEN: string
     TEMPLATE_FILE: string
+    SUPABASE_STORAGE_BUCKET: string
 }
 
 const env: EnvConfig = {
@@ -50,6 +51,7 @@ const env: EnvConfig = {
     MOCK_3DLOOK: process.env.MOCK_3DLOOK === 'true',
     APP_TOKEN: process.env.APP_TOKEN ?? '',
     TEMPLATE_FILE: process.env.TEMPLATE_FILE ?? 'order.xlsx',
+    SUPABASE_STORAGE_BUCKET: process.env.SUPABASE_STORAGE_BUCKET ?? 'orders',
 }
 
 for (const [key, value] of Object.entries(env)) {

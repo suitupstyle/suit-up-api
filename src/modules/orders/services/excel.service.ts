@@ -6,11 +6,13 @@ import { type ExcelCellUpdate, type ExcelGenerationJob } from '../../../types/de
  */
 export class ExcelService {
     /**
-     * Generates new Excel file from template with provided updates
+     * Generates Excel file from template with provided updates and returns it as a Buffer.
+     * No local disk write — caller is responsible for persisting the buffer.
      * @param job - Generation job configuration
+     * @returns Buffer containing the generated xlsx file
      * @throws Error when file operations fail
      */
-    async generateFromTemplate(job: ExcelGenerationJob): Promise<void> {
+    async generateFromTemplate(job: ExcelGenerationJob): Promise<Buffer> {
         const workbook = new ExcelJS.Workbook()
         await workbook.xlsx.readFile(job.templatePath)
 
@@ -20,7 +22,7 @@ export class ExcelService {
             this.applyBulkUpdates(workbook, job.updates)
         }
 
-        await workbook.xlsx.writeFile(job.outputPath)
+        return await workbook.xlsx.writeBuffer() as unknown as Promise<Buffer>
     }
 
     /**

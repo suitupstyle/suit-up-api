@@ -12,7 +12,10 @@ export interface ExcelCellUpdate {
  */
 export interface ExcelGenerationJob {
     templatePath: string
-    outputPath: string
+    /** Supabase Storage bucket name */
+    storageBucket: string
+    /** Object key within the bucket, e.g. "orders/order-1.xlsx" */
+    storageKey: string
     updates: ExcelCellUpdate[] | Record<string, unknown>
     metadata?: Record<string, unknown>
 }
