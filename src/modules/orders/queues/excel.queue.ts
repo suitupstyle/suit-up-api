@@ -23,7 +23,7 @@ class ExcelQueue {
     async addJob(job: ExcelGenerationJob): Promise<void> {
         this.queue.push(job)
         // #region agent log H-D
-        logger.info('[dbg:e3f027] addJob', { hyp: 'H-D', queueLength: this.queue.length, isProcessing: this.isProcessing, orderId: (job.metadata as any)?.orderId })
+        logger.info(`[dbg:e3f027] addJob queueLength=${this.queue.length} isProcessing=${this.isProcessing} orderId=${(job.metadata as any)?.orderId}`)
         // #endregion
         if (!this.isProcessing) {
             this.processQueue()

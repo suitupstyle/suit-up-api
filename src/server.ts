@@ -11,7 +11,7 @@ AppDataSource.initialize()
             logger.info(`Server running on port ${env.PORT}`)
             // #region agent log H-A/H-C
             const m = process.memoryUsage()
-            logger.info('[dbg:e3f027] startup', { hyp: 'H-A/H-C', heapUsedMB: Math.round(m.heapUsed/1024/1024), heapTotalMB: Math.round(m.heapTotal/1024/1024), rssMB: Math.round(m.rss/1024/1024), execArgv: process.execArgv, nodeVersion: process.version })
+            logger.info(`[dbg:e3f027] startup heapUsedMB=${Math.round(m.heapUsed/1024/1024)} heapTotalMB=${Math.round(m.heapTotal/1024/1024)} rssMB=${Math.round(m.rss/1024/1024)} execArgv=${JSON.stringify(process.execArgv)} nodeVersion=${process.version}`)
             // #endregion
         })
     })

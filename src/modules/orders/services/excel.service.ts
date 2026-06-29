@@ -16,7 +16,7 @@ export class ExcelService {
     async generateFromTemplate(job: ExcelGenerationJob): Promise<Buffer> {
         // #region agent log H-B/H-C
         const memBefore = process.memoryUsage()
-        logger.info('[dbg:e3f027] before-readFile', { hyp: 'H-B/H-C', templatePath: job.templatePath, heapUsedMB: Math.round(memBefore.heapUsed/1024/1024), heapTotalMB: Math.round(memBefore.heapTotal/1024/1024), rssMB: Math.round(memBefore.rss/1024/1024) })
+        logger.info(`[dbg:e3f027] before-readFile templatePath=${job.templatePath} heapUsedMB=${Math.round(memBefore.heapUsed/1024/1024)} rssMB=${Math.round(memBefore.rss/1024/1024)}`)
         // #endregion
 
         const workbook = new ExcelJS.Workbook()
@@ -24,7 +24,7 @@ export class ExcelService {
 
         // #region agent log H-B
         const memAfterRead = process.memoryUsage()
-        logger.info('[dbg:e3f027] after-readFile', { hyp: 'H-B', heapUsedMB: Math.round(memAfterRead.heapUsed/1024/1024), heapTotalMB: Math.round(memAfterRead.heapTotal/1024/1024), rssMB: Math.round(memAfterRead.rss/1024/1024), deltaHeapMB: Math.round((memAfterRead.heapUsed-memBefore.heapUsed)/1024/1024) })
+        logger.info(`[dbg:e3f027] after-readFile heapUsedMB=${Math.round(memAfterRead.heapUsed/1024/1024)} rssMB=${Math.round(memAfterRead.rss/1024/1024)} deltaHeapMB=${Math.round((memAfterRead.heapUsed-memBefore.heapUsed)/1024/1024)}`)
         // #endregion
 
         if (Array.isArray(job.updates)) {
@@ -37,7 +37,7 @@ export class ExcelService {
 
         // #region agent log H-E
         const memAfterWrite = process.memoryUsage()
-        logger.info('[dbg:e3f027] after-writeBuffer', { hyp: 'H-E', heapUsedMB: Math.round(memAfterWrite.heapUsed/1024/1024), heapTotalMB: Math.round(memAfterWrite.heapTotal/1024/1024), rssMB: Math.round(memAfterWrite.rss/1024/1024), bufferSizeKB: Math.round(buf.length/1024) })
+        logger.info(`[dbg:e3f027] after-writeBuffer heapUsedMB=${Math.round(memAfterWrite.heapUsed/1024/1024)} rssMB=${Math.round(memAfterWrite.rss/1024/1024)} bufferSizeKB=${Math.round(buf.length/1024)}`)
         // #endregion
 
         return buf
