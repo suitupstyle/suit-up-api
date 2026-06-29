@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express'
+import env from '../../../config/env'
 import { ExcelGenerationJob } from '../../../types/definitions'
 import { SuccessResponse } from '../../../utils/response'
 import { Order } from '../entities/order'
@@ -68,7 +69,8 @@ export const wasPaidOrder: RequestHandler<{ id: number }, {}, any> = async (req,
 export const generateExcelExample: RequestHandler = async (req, res, next) => {
     const job: ExcelGenerationJob = {
         templatePath: './templates/report.xlsx',
-        outputPath: `./output/report-${Date.now()}.xlsx`,
+        storageBucket: env.SUPABASE_STORAGE_BUCKET,
+        storageKey: `report-${Date.now()}.xlsx`,
         updates: [], // <-- Here goes the data to update, just check the type definition
         metadata: {}, // <-- Context additional data, optional
     }

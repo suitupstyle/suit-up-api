@@ -150,7 +150,7 @@ export class OrderService {
     }
 
     async enqueueExcelGeneration(order: Order): Promise<{
-        outputFile: string
+        storageUrl: string
         queueStatus: any
     }> {
         const id = order.id
@@ -158,10 +158,12 @@ export class OrderService {
         const o = order.orderData
         const j = order.jacketData
 
+        const storageKey = `order-${id}.xlsx`
         const sheetName = 'BOOKING'
         const job: ExcelGenerationJob = {
             templatePath: `./templates/${env.TEMPLATE_FILE}`,
-            outputPath: `./output/order-${id}.xlsx`,
+            storageBucket: env.SUPABASE_STORAGE_BUCKET,
+            storageKey,
             updates: [
                 { sheetName, cellAddress: 'E2', value: o.order_type },
                 { sheetName, cellAddress: 'E3', value: o.quantity },
@@ -205,8 +207,12 @@ export class OrderService {
         logger.info(`Enqueue Excel job for order ${id}`)
         await excelQueue.addJob(job)
 
+        const { data } = supabaseAdmin.storage
+            .from(env.SUPABASE_STORAGE_BUCKET)
+            .getPublicUrl(storageKey)
+
         return {
-            outputFile: job.outputPath,
+            storageUrl: data.publicUrl,
             queueStatus: excelQueue.getStatus(),
         }
     }
