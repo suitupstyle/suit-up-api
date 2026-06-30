@@ -1,4 +1,5 @@
 import { Router } from 'express'
+
 import { validate } from '../../../middlewares/validate'
 import { createCheckoutSession, createPaymentIntent } from '../controllers/payments.controller'
 import { CreatePaymentIntentSchema } from '../validations/create‑payment-intent.schema'

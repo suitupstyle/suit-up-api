@@ -8,6 +8,7 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm'
+
 import { Customer } from '../../customers/entities/customer'
 import { Item } from '../../items/entities/item'
 import { JacketData } from '../interfaces/jacket-data'

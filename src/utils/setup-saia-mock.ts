@@ -1,5 +1,6 @@
 import type { AxiosInstance } from 'axios'
 import MockAdapter from 'axios-mock-adapter'
+
 import queueMock from '../mocks/saia-person-create.json'
 import personMock from '../mocks/saia-person.json'
 

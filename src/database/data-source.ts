@@ -1,5 +1,6 @@
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
+
 import env from '../config/env'
 
 export const AppDataSource = new DataSource({

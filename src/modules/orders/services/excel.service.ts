@@ -1,4 +1,5 @@
 import ExcelJS, { type CellValue } from 'exceljs'
+
 import { type ExcelCellUpdate, type ExcelGenerationJob } from '../../../types/definitions'
 
 /**
