@@ -8,6 +8,7 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm'
+
 import { Customer } from '../../customers/entities/customer'
 import { Item } from '../../items/entities/item'
 import { JacketData } from '../interfaces/jacket-data'
@@ -44,6 +45,9 @@ export class Order {
 
     @Column({ type: 'boolean', name: 'is_paid', default: false })
     isPaid: boolean = false
+
+    @Column({ type: 'text', name: 'excel_url', nullable: true })
+    excelUrl: string | null = null
 
     @ManyToMany(() => Item, (item) => item.orders, {
         cascade: true,

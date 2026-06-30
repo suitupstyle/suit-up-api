@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express'
+
 import env from '../config/env'
 
 export const verifyAppToken: RequestHandler = (req, res, next) => {

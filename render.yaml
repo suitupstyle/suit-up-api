@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     buildCommand: pnpm install --frozen-lockfile && pnpm run build
-    startCommand: pnpm start
+    startCommand: pnpm run migration:run:prod && pnpm start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
@@ -39,11 +39,13 @@ services:
         sync: false
       - key: SAIA_API_KEY
         sync: false
+      - key: FRONTEND_BASE_URL
+        sync: false
       - key: SUPABASE_URL
         sync: false
-      - key: SUPABASE_PUBLIC_API_KEY
+      - key: SUPABASE_PUBLISHABLE_KEY
         sync: false
-      - key: STRIPE_PUBLISHABLE_KEY
+      - key: SUPABASE_SECRET_KEY
         sync: false
       - key: STRIPE_SECRET_KEY
         sync: false

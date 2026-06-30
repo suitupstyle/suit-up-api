@@ -2,6 +2,7 @@ import cors from 'cors'
 import express, { Application } from 'express'
 import 'reflect-metadata'
 import helmet from 'helmet'
+
 import env from './config/env'
 import { verifyAppToken } from './middlewares/verifyAppToken'
 import { errorHandler } from './middlewares/errorHandler'

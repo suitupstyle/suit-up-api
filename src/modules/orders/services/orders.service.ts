@@ -1,10 +1,11 @@
 import { In, Repository } from 'typeorm'
+
 import env from '../../../config/env'
 import { AppDataSource } from '../../../database/data-source'
 import { ExcelGenerationJob } from '../../../types/definitions'
 import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
-import { supabase } from '../../../utils/supabase'
+import { supabaseAdmin } from '../../../utils/supabase'
 import { ListResult } from '../../common/interfaces/list-result.interface'
 import { Customer } from '../../customers/entities/customer'
 import { Item } from '../../items/entities/item'
@@ -73,28 +74,35 @@ export class OrderService {
             where: { email: customerEmail },
         })
 
-        try {
-            if (!customer) {
-                const { data, error } = await supabase.auth.admin.createUser({
-                    email: customerEmail,
-                    password: customerPassword,
-                    email_confirm: true,
-                    user_metadata: {
-                        name: customerName,
-                        role: 'customer',
-                    },
-                })
-                if (error || !data?.user?.id) {
-                    throw new HttpError(502, 'Customer could not be created')
-                }
+        if (!customer) {
+            const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+                email: customerEmail,
+                password: customerPassword,
+                email_confirm: true,
+                user_metadata: {
+                    name: customerName,
+                    role: 'customer',
+                },
+            })
+            if (authError || !authData?.user?.id) {
+                logger.error('Supabase Auth createUser error', { authError })
+                throw new HttpError(502, `Failed to create customer auth account: ${authError?.message ?? 'unknown error'}`)
+            }
+
+            try {
                 customer = this.customerRepo.create({
                     name: customerName,
                     email: customerEmail,
-                    supabaseUserId: data.user.id,
+                    supabaseUserId: authData.user.id,
                 })
                 await this.customerRepo.save(customer)
+            } catch (err: any) {
+                logger.error('Customer DB save error', { err })
+                throw new HttpError(500, 'Customer was created in Auth but could not be saved to the database')
             }
+        }
 
+        try {
             const order = this.orderRepo.create({
                 orderData: {
                     order_type: orderType ?? 'ABC',
@@ -121,8 +129,8 @@ export class OrderService {
 
             return saved
         } catch (err: any) {
-            logger.error('Create order error:', err.response?.data ?? err.message)
-            throw new HttpError(err.response?.status ?? 502, '3DLOOK integration failed')
+            logger.error('Order creation error', { err })
+            throw new HttpError(500, 'Failed to create the order')
         }
     }
 
@@ -143,7 +151,7 @@ export class OrderService {
     }
 
     async enqueueExcelGeneration(order: Order): Promise<{
-        outputFile: string
+        storageUrl: string
         queueStatus: any
     }> {
         const id = order.id
@@ -151,10 +159,12 @@ export class OrderService {
         const o = order.orderData
         const j = order.jacketData
 
+        const storageKey = `order-${id}.xlsx`
         const sheetName = 'BOOKING'
         const job: ExcelGenerationJob = {
             templatePath: `./templates/${env.TEMPLATE_FILE}`,
-            outputPath: `./output/order-${id}.xlsx`,
+            storageBucket: env.SUPABASE_STORAGE_BUCKET,
+            storageKey,
             updates: [
                 { sheetName, cellAddress: 'E2', value: o.order_type },
                 { sheetName, cellAddress: 'E3', value: o.quantity },
@@ -195,19 +205,30 @@ export class OrderService {
             },
         }
 
-        logger.info(`Enqueue Excel job for order ${id}`)
+        logger.info(`Enqueue Excel job for order ${id}`, { orderId: id })
         await excelQueue.addJob(job)
 
+        const { data } = supabaseAdmin.storage
+            .from(env.SUPABASE_STORAGE_BUCKET)
+            .getPublicUrl(storageKey)
+
         return {
-            outputFile: job.outputPath,
+            storageUrl: data.publicUrl,
             queueStatus: excelQueue.getStatus(),
         }
     }
 
     async markAsPaid(order: Order) {
+        if (order.isPaid) {
+            logger.info('Order already marked as paid, skipping', { orderId: order.id })
+            return false // signals "already done"
+        }
+
         order.isPaid = true
         order.deliveredAt = new Date()
 
-        return this.orderRepo.save(order)
+        await this.orderRepo.save(order)
+
+        return true
     }
 }
