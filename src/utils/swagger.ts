@@ -1,7 +1,9 @@
 import path from 'path'
+
 import { Application } from 'express'
 import swaggerJSDoc, { Options } from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+
 import env from '../config/env'
 
 const rootDir = process.cwd()

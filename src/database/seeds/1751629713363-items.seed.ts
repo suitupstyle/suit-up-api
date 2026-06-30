@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm'
 import { Seeder, SeederFactoryManager } from 'typeorm-extension'
+
 import { Item } from '../../modules/items/entities/item'
 
 export class ItemsSeed1751629713363 implements Seeder {

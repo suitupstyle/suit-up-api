@@ -1,4 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express'
+
 import env from '../../../config/env'
 import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
@@ -10,6 +11,9 @@ import { CreatePaymentIntentDTO } from '../validations/create‑payment-intent.s
 const service = new PaymentService()
 const orderService = new OrderService()
 
+// ---------------------------------------------------------------------------
+// Payment Intent flow
+// ---------------------------------------------------------------------------
 export const createPaymentIntent: RequestHandler = async (
     req: Request<{}, {}, CreatePaymentIntentDTO>,
     res: Response<SuccessResponse<{ clientSecret: string }> | ErrorResponse>,
@@ -19,6 +23,30 @@ export const createPaymentIntent: RequestHandler = async (
         const data = req.body
 
         const clientSecret = await service.createPaymentIntent(data)
+
+        const payload: SuccessResponse<{ clientSecret: string }> = {
+            data: { clientSecret },
+        }
+
+        res.status(201).json(payload)
+        return
+    } catch (err: any) {
+        return next(err)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Checkout Session flow (kept for potential future use)
+// ---------------------------------------------------------------------------
+export const createCheckoutSession: RequestHandler = async (
+    req: Request<{}, {}, CreatePaymentIntentDTO>,
+    res: Response<SuccessResponse<{ clientSecret: string }> | ErrorResponse>,
+    next: NextFunction
+) => {
+    try {
+        const data = req.body
+
+        const clientSecret = await service.createCheckoutSession(data)
 
         const payload: SuccessResponse<{ clientSecret: string }> = {
             data: { clientSecret },
@@ -50,39 +78,53 @@ export const handleWebhook: RequestHandler = async (
 
     const eventType = event?.type
     switch (eventType) {
+        // ------------------------------------------------------------------
+        // Payment Intent events
+        // ------------------------------------------------------------------
         case 'payment_intent.succeeded': {
-            const intent = event.data.object
-            logger.info(`PaymentIntent succeeded: ${intent.id}`)
-            logger.info(`Full metadata payload: ${JSON.stringify(intent.metadata)}`)
+            const paymentIntent = event.data.object
+            logger.info('PaymentIntent succeeded', {
+                paymentIntentId: paymentIntent.id,
+                orderId: Number(paymentIntent.metadata?.order_id) || undefined,
+                eventType,
+            })
 
-            // const orderId = Number(intent.metadata?.orderId)
-            const orderId = 1
-            logger.info(`PaymentIntent metadata: ${JSON.stringify(intent.metadata)}`)
+            const orderId = Number(paymentIntent.metadata?.order_id)
             if (!orderId) {
-                logger.error('No orderId in PaymentIntent metadata, skipping Excel generation')
+                logger.error('No orderId in PaymentIntent metadata, skipping Excel generation', {
+                    paymentIntentId: paymentIntent.id,
+                    eventType,
+                })
                 break
             }
 
             try {
                 const order = await orderService.findByIdOrFail(orderId)
 
-                await orderService.markAsPaid(order)
-                await orderService.enqueueExcelGeneration(order)
+                const wasPaid = await orderService.markAsPaid(order)
+                if (wasPaid) {
+                    await orderService.enqueueExcelGeneration(order)
+                }
 
-                logger.info(`Excel generated for order ${orderId}`)
+                logger.info('Excel generated for order', { orderId })
             } catch (e) {
-                logger.error('Error generating order Excel:', e)
+                logger.error('Error processing payment_intent.succeeded', { err: e, orderId, eventType })
             }
 
             break
         }
         case 'payment_intent.payment_failed': {
-            const failure = event.data.object
-            logger.error(`Payment failed: ${failure.last_payment_error?.message}`)
+            const paymentIntent = event.data.object
+            logger.error('PaymentIntent payment failed', {
+                paymentIntentId: paymentIntent.id,
+                errorMessage: paymentIntent.last_payment_error?.message,
+                eventType,
+            })
             break
         }
+
         default:
-            logger.info(`Unhandled event type ${eventType}`)
+            logger.info('Unhandled Stripe webhook event type', { eventType })
     }
 
     res.json({ received: true })

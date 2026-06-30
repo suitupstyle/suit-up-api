@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
+
 import env from '../config/env'
 import {
     FrontParams,
@@ -6,6 +7,7 @@ import {
     SideParams,
     VolumeParams,
 } from '../modules/orders/interfaces/measurement-data'
+
 import { HttpError } from './error'
 import logger from './logger'
 import { setupSaiaMock } from "./setup-saia-mock";
@@ -68,7 +70,7 @@ class SAIA {
 
             return { task_set_id: taskSetId }
         } catch (e) {
-            logger.error(JSON.stringify(e))
+            logger.error('Saia createPerson failed', { err: e })
             throw e
         }
     }
@@ -85,7 +87,7 @@ class SAIA {
 
             return resp.data
         } catch (e) {
-            logger.error(JSON.stringify(e))
+            logger.error('Saia getTaskSet failed', { err: e })
             throw e
         }
     }

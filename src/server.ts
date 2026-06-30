@@ -8,7 +8,7 @@ AppDataSource.initialize()
         logger.info('Data Source has been initialized!')
 
         app.listen(env.PORT, () => {
-            logger.info(`Server running on port ${env.PORT}`)
+            logger.info('Server running', { port: env.PORT })
         })
     })
     .catch((err) => {
