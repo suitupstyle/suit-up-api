@@ -68,7 +68,7 @@ class SAIA {
 
             return { task_set_id: taskSetId }
         } catch (e) {
-            logger.error(JSON.stringify(e))
+            logger.error('Saia createPerson failed', { err: e })
             throw e
         }
     }
@@ -85,7 +85,7 @@ class SAIA {
 
             return resp.data
         } catch (e) {
-            logger.error(JSON.stringify(e))
+            logger.error('Saia getTaskSet failed', { err: e })
             throw e
         }
     }

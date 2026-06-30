@@ -82,11 +82,18 @@ export const handleWebhook: RequestHandler = async (
         // ------------------------------------------------------------------
         case 'payment_intent.succeeded': {
             const paymentIntent = event.data.object
-            logger.info(`PaymentIntent succeeded: ${paymentIntent.id}`)
+            logger.info('PaymentIntent succeeded', {
+                paymentIntentId: paymentIntent.id,
+                orderId: Number(paymentIntent.metadata?.order_id) || undefined,
+                eventType,
+            })
 
             const orderId = Number(paymentIntent.metadata?.order_id)
             if (!orderId) {
-                logger.error('No orderId in PaymentIntent metadata, skipping Excel generation')
+                logger.error('No orderId in PaymentIntent metadata, skipping Excel generation', {
+                    paymentIntentId: paymentIntent.id,
+                    eventType,
+                })
                 break
             }
 
@@ -98,23 +105,25 @@ export const handleWebhook: RequestHandler = async (
                     await orderService.enqueueExcelGeneration(order)
                 }
 
-                logger.info(`Excel generated for order ${orderId}`)
+                logger.info('Excel generated for order', { orderId })
             } catch (e) {
-                logger.error('Error processing payment_intent.succeeded:', e)
+                logger.error('Error processing payment_intent.succeeded', { err: e, orderId, eventType })
             }
 
             break
         }
         case 'payment_intent.payment_failed': {
             const paymentIntent = event.data.object
-            logger.error(
-                `PaymentIntent payment failed: ${paymentIntent.id} — ${paymentIntent.last_payment_error?.message}`
-            )
+            logger.error('PaymentIntent payment failed', {
+                paymentIntentId: paymentIntent.id,
+                errorMessage: paymentIntent.last_payment_error?.message,
+                eventType,
+            })
             break
         }
 
         default:
-            logger.info(`Unhandled event type ${eventType}`)
+            logger.info('Unhandled Stripe webhook event type', { eventType })
     }
 
     res.json({ received: true })

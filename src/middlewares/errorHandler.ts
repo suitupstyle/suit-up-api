@@ -4,7 +4,7 @@ import { HttpError } from '../utils/error'
 
 export const errorHandler: ErrorRequestHandler = (err: unknown, _req, res, _next) => {
     if (err instanceof HttpError) {
-        logger.error('HttpError error:', err)
+        logger.error('HttpError error', { err, status: err.status })
         res.status(err.status).json({ error: { message: err.message } })
         return
     }

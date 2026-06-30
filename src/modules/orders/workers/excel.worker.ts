@@ -29,11 +29,20 @@ export class ExcelWorker {
             })
 
         if (error) {
-            logger.error(`Supabase Storage upload failed for ${job.storageKey}: ${error.message}`)
+            logger.error('Supabase Storage upload failed', {
+                storageKey: job.storageKey,
+                storageBucket: job.storageBucket,
+                orderId: job.metadata?.orderId,
+                errorMessage: error.message,
+            })
             throw new Error(`Storage upload failed: ${error.message}`)
         }
 
-        logger.info(`Successfully uploaded to Supabase Storage: ${job.storageBucket}/${job.storageKey}`)
+        logger.info('Successfully uploaded to Supabase Storage', {
+            storageKey: job.storageKey,
+            storageBucket: job.storageBucket,
+            orderId: job.metadata?.orderId,
+        })
 
         const orderId = job.metadata?.orderId as number | undefined
         if (orderId) {
@@ -44,13 +53,18 @@ export class ExcelWorker {
                 .createSignedUrl(job.storageKey, SIGNED_URL_TTL_SECONDS)
 
             if (signError || !signedData?.signedUrl) {
-                logger.error(`Failed to create signed URL for order ${orderId}: ${signError?.message}`)
+                logger.error('Failed to create signed URL for order', {
+                    orderId,
+                    storageKey: job.storageKey,
+                    storageBucket: job.storageBucket,
+                    errorMessage: signError?.message,
+                })
                 return
             }
 
             const orderRepo = AppDataSource.getRepository(Order)
             await orderRepo.update(orderId, { excelUrl: signedData.signedUrl })
-            logger.info(`Excel URL saved for order ${orderId}`)
+            logger.info('Excel URL saved for order', { orderId })
         }
     }
 }

@@ -84,7 +84,7 @@ export class OrderService {
                 },
             })
             if (authError || !authData?.user?.id) {
-                logger.error('Supabase Auth createUser error:', authError?.message)
+                logger.error('Supabase Auth createUser error', { authError })
                 throw new HttpError(502, `Failed to create customer auth account: ${authError?.message ?? 'unknown error'}`)
             }
 
@@ -96,7 +96,7 @@ export class OrderService {
                 })
                 await this.customerRepo.save(customer)
             } catch (err: any) {
-                logger.error('Customer DB save error:', err.message)
+                logger.error('Customer DB save error', { err })
                 throw new HttpError(500, 'Customer was created in Auth but could not be saved to the database')
             }
         }
@@ -128,7 +128,7 @@ export class OrderService {
 
             return saved
         } catch (err: any) {
-            logger.error('Order creation error:', err.message)
+            logger.error('Order creation error', { err })
             throw new HttpError(500, 'Failed to create the order')
         }
     }
@@ -204,7 +204,7 @@ export class OrderService {
             },
         }
 
-        logger.info(`Enqueue Excel job for order ${id}`)
+        logger.info(`Enqueue Excel job for order ${id}`, { orderId: id })
         await excelQueue.addJob(job)
 
         const { data } = supabaseAdmin.storage
@@ -219,7 +219,7 @@ export class OrderService {
 
     async markAsPaid(order: Order) {
         if (order.isPaid) {
-            logger.info(`Order ${order.id} already marked as paid, skipping`)
+            logger.info('Order already marked as paid, skipping', { orderId: order.id })
             return false // signals "already done"
         }
 
