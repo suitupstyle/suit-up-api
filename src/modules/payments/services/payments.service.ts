@@ -1,71 +1,80 @@
 import env from '../../../config/env'
+import { airwallex } from '../../../utils/airwallex'
 import { HttpError } from '../../../utils/error'
+import logger from '../../../utils/logger'
 import { stripe } from '../../../utils/stripe'
+import { OrderService } from '../../orders/services/orders.service'
 import { CreatePaymentIntentDTO } from '../validations/create‑payment-intent.schema'
 
+export type CreatedPaymentIntent = {
+    intentId: string
+    clientSecret: string
+    currency: string
+}
+
 export class PaymentService {
-    // ---------------------------------------------------------------------------
-    // Payment Intent flow
-    // ---------------------------------------------------------------------------
-    async createPaymentIntent(input: CreatePaymentIntentDTO): Promise<string> {
-        try {
-            const paymentIntent = await stripe.paymentIntents.create({
-                amount: input.amount,
-                currency: input.currency ?? 'usd',
-                metadata: {
-                    order_id: input.orderId.toString(),
-                },
-                // Omitting payment_method_types enables dynamic payment methods
-                // (Stripe auto-selects based on currency, location, amount, etc.)
-            })
+    private readonly orderService = new OrderService()
 
-            return paymentIntent.client_secret!
-        } catch (err: any) {
-            const message = err.raw?.message ?? err.message ?? 'PaymentIntent creation failed'
-            const status = err.statusCode ?? 502
+    async createPaymentIntent(input: CreatePaymentIntentDTO): Promise<CreatedPaymentIntent> {
+        const order = await this.orderService.findByIdOrFail(input.orderId)
 
-            throw new HttpError(status, message)
+        if (order.isPaid) {
+            throw new HttpError(409, 'Order is already paid')
         }
-    }
 
-    // ---------------------------------------------------------------------------
-    // Checkout Session flow (kept for potential future use)
-    // ---------------------------------------------------------------------------
-    async createCheckoutSession(input: CreatePaymentIntentDTO): Promise<string> {
+        const amount = roundMajorUnits(Number(order.pricingData.price) * (1 + env.TAX_RATE))
+        if (!(amount > 0)) {
+            throw new HttpError(422, 'Order amount must be greater than 0')
+        }
+
+        const currency = (input.currency ?? order.pricingData.currency ?? 'usd').toUpperCase()
+
         try {
-            const session = await stripe.checkout.sessions.create({
-                ui_mode: 'embedded_page',
-                mode: 'payment',
-                return_url: `${env.FRONTEND_BASE_URL}/orders/payment-confirmation?session_id={CHECKOUT_SESSION_ID}`,
-                line_items: [
-                    {
-                        price_data: {
-                            currency: input.currency ?? 'usd',
-                            product_data: { name: 'Suit Order' },
-                            unit_amount: input.amount,
-                        },
-                        quantity: 1,
-                    },
-                ],
+            const paymentIntent = await airwallex.createPaymentIntent({
+                amount,
+                currency,
+                merchantOrderId: String(order.id),
+                returnUrl: `${env.FRONTEND_BASE_URL}/orders/payment-confirmation?orderId=${order.id}`,
                 metadata: {
-                    order_id: input.orderId.toString(),
+                    order_id: String(order.id),
                 },
             })
 
-            return session.client_secret!
-        } catch (err: any) {
-            const message = err.raw?.message ?? err.message ?? 'Checkout session creation failed'
-            const status = err.statusCode ?? 502
+            if (!paymentIntent.client_secret) {
+                throw new HttpError(502, 'Airwallex did not return a client secret')
+            }
 
-            throw new HttpError(status, message)
+            logger.info('Airwallex PaymentIntent created', {
+                orderId: order.id,
+                paymentIntentId: paymentIntent.id,
+                amount,
+                currency: paymentIntent.currency,
+            })
+
+            return {
+                intentId: paymentIntent.id,
+                clientSecret: paymentIntent.client_secret,
+                currency: paymentIntent.currency,
+            }
+        } catch (err) {
+            if (err instanceof HttpError) {
+                throw err
+            }
+
+            throw new HttpError(502, 'PaymentIntent creation failed')
         }
     }
 
     handleWebhookSignature(payload: Buffer, signature: string, webhookSecret: string) {
         try {
             return stripe.webhooks.constructEvent(payload, signature, webhookSecret)
-        } catch (err: any) {
-            throw new HttpError(400, `Webhook Error: ${err.message}`)
+        } catch (err) {
+            const message = err instanceof Error ? err.message : 'invalid signature'
+            throw new HttpError(400, `Webhook Error: ${message}`)
         }
     }
+}
+
+function roundMajorUnits(value: number): number {
+    return Math.round(value * 100) / 100
 }

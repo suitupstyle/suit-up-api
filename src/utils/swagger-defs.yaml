@@ -377,18 +377,15 @@ components:
         CreatePaymentIntentInput:
             type: object
             required:
-                - amount
                 - orderId
             properties:
-                amount:
-                    type: integer
-                    description: Amount in the smallest currency unit
                 currency:
                     type: string
-                    description: "Three‑letter ISO currency code (default: 'usd')"
+                    enum: [usd, cny]
+                    description: "Three-letter ISO currency code. Defaults to the order's pricing currency."
                 orderId:
                     type: integer
-                    description: Internal order ID
+                    description: Internal order ID. Amount is computed server-side from the order price plus tax.
 
         SuccessResponse_Boolean:
             allOf:

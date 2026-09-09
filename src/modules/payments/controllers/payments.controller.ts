@@ -5,56 +5,24 @@ import { HttpError } from '../../../utils/error'
 import logger from '../../../utils/logger'
 import { ErrorResponse, SuccessResponse } from '../../../utils/response'
 import { OrderService } from '../../orders/services/orders.service'
-import { PaymentService } from '../services/payments.service'
+import { CreatedPaymentIntent, PaymentService } from '../services/payments.service'
 import { CreatePaymentIntentDTO } from '../validations/create‑payment-intent.schema'
 
 const service = new PaymentService()
 const orderService = new OrderService()
 
-// ---------------------------------------------------------------------------
-// Payment Intent flow
-// ---------------------------------------------------------------------------
-export const createPaymentIntent: RequestHandler = async (
-    req: Request<{}, {}, CreatePaymentIntentDTO>,
-    res: Response<SuccessResponse<{ clientSecret: string }> | ErrorResponse>,
-    next: NextFunction
-) => {
+export const createPaymentIntent: RequestHandler<
+    Record<string, never>,
+    SuccessResponse<CreatedPaymentIntent> | ErrorResponse,
+    CreatePaymentIntentDTO
+> = async (req, res, next) => {
     try {
-        const data = req.body
-
-        const clientSecret = await service.createPaymentIntent(data)
-
-        const payload: SuccessResponse<{ clientSecret: string }> = {
-            data: { clientSecret },
-        }
+        const paymentIntent = await service.createPaymentIntent(req.body)
+        const payload: SuccessResponse<CreatedPaymentIntent> = { data: paymentIntent }
 
         res.status(201).json(payload)
         return
-    } catch (err: any) {
-        return next(err)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Checkout Session flow (kept for potential future use)
-// ---------------------------------------------------------------------------
-export const createCheckoutSession: RequestHandler = async (
-    req: Request<{}, {}, CreatePaymentIntentDTO>,
-    res: Response<SuccessResponse<{ clientSecret: string }> | ErrorResponse>,
-    next: NextFunction
-) => {
-    try {
-        const data = req.body
-
-        const clientSecret = await service.createCheckoutSession(data)
-
-        const payload: SuccessResponse<{ clientSecret: string }> = {
-            data: { clientSecret },
-        }
-
-        res.status(201).json(payload)
-        return
-    } catch (err: any) {
+    } catch (err: unknown) {
         return next(err)
     }
 }
@@ -72,7 +40,7 @@ export const handleWebhook: RequestHandler = async (
             throw new HttpError(400, 'Missing stripe-signature header')
         }
         event = service.handleWebhookSignature(payload, sig, env.STRIPE_WEBHOOK_SECRET)
-    } catch (err: any) {
+    } catch (err: unknown) {
         return next(err)
     }
 
@@ -108,7 +76,11 @@ export const handleWebhook: RequestHandler = async (
 
                 logger.info('Excel generated for order', { orderId })
             } catch (e) {
-                logger.error('Error processing payment_intent.succeeded', { err: e, orderId, eventType })
+                logger.error('Error processing payment_intent.succeeded', {
+                    err: e,
+                    orderId,
+                    eventType,
+                })
             }
 
             break
