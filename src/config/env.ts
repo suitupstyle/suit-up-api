@@ -20,6 +20,7 @@ interface EnvConfig {
     AIRWALLEX_CLIENT_ID: string
     AIRWALLEX_API_KEY: string
     AIRWALLEX_BASE_URL: string
+    AIRWALLEX_WEBHOOK_SECRET: string
     TAX_RATE: number
     DATABASE_HOST: string
     DATABASE_PORT: string
@@ -50,6 +51,7 @@ const env: EnvConfig = {
     AIRWALLEX_CLIENT_ID: process.env.AIRWALLEX_CLIENT_ID ?? '',
     AIRWALLEX_API_KEY: process.env.AIRWALLEX_API_KEY ?? '',
     AIRWALLEX_BASE_URL: process.env.AIRWALLEX_BASE_URL ?? 'https://api.sandbox.airwallex.com',
+    AIRWALLEX_WEBHOOK_SECRET: process.env.AIRWALLEX_WEBHOOK_SECRET ?? '',
     TAX_RATE: parseTaxRate(process.env.TAX_RATE),
     DATABASE_HOST: process.env.DATABASE_HOST ?? '',
     DATABASE_PORT: process.env.DATABASE_PORT ?? '',

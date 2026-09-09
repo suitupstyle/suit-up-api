@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto'
 
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 
@@ -9,6 +9,7 @@ import logger from './logger'
 
 const TOKEN_REFRESH_SKEW_MS = 60_000
 const DEFAULT_TOKEN_TTL_MS = 25 * 60 * 1000
+const WEBHOOK_TIMESTAMP_TOLERANCE_MS = 5 * 60 * 1000
 
 export type CreateAirwallexPaymentIntentInput = {
     amount: number
@@ -26,11 +27,20 @@ export type AirwallexPaymentIntent = {
     currency: string
     status: string
     merchant_order_id?: string
-    client_secret: string
+    client_secret?: string
     metadata?: Record<string, string>
     return_url?: string
     created_at?: string
     updated_at?: string
+}
+
+export type AirwallexWebhookEvent = {
+    id: string
+    name: string
+    account_id?: string
+    data?: {
+        object?: AirwallexPaymentIntent
+    }
 }
 
 type AirwallexLoginResponse = {
@@ -195,6 +205,54 @@ function toHttpError(err: unknown, fallback: string): HttpError {
 
     const message = err instanceof Error ? err.message : fallback
     return new HttpError(502, message)
+}
+
+export function parseAirwallexWebhook(
+    payload: Buffer,
+    timestamp: string | undefined,
+    signature: string | undefined,
+    secret: string
+): AirwallexWebhookEvent {
+    if (!timestamp) {
+        throw new HttpError(400, 'Missing x-timestamp header')
+    }
+    if (!signature) {
+        throw new HttpError(400, 'Missing x-signature header')
+    }
+
+    verifyWebhookSignature(payload, timestamp, signature, secret)
+
+    try {
+        return JSON.parse(payload.toString('utf8')) as AirwallexWebhookEvent
+    } catch {
+        throw new HttpError(400, 'Webhook Error: invalid JSON')
+    }
+}
+
+function verifyWebhookSignature(
+    payload: Buffer,
+    timestamp: string,
+    signature: string,
+    secret: string
+) {
+    const expectedHex = createHmac('sha256', secret)
+        .update(`${timestamp}${payload.toString('utf8')}`)
+        .digest('hex')
+    const expected = Buffer.from(expectedHex, 'hex')
+    const received = Buffer.from(signature, 'hex')
+
+    if (expected.length !== received.length || !timingSafeEqual(expected, received)) {
+        throw new HttpError(400, 'Webhook Error: invalid signature')
+    }
+
+    const receivedAt = Number(timestamp)
+    if (!Number.isFinite(receivedAt)) {
+        throw new HttpError(400, 'Webhook Error: invalid timestamp')
+    }
+
+    if (Math.abs(Date.now() - receivedAt) > WEBHOOK_TIMESTAMP_TOLERANCE_MS) {
+        throw new HttpError(400, 'Webhook Error: timestamp outside tolerance')
+    }
 }
 
 export const airwallex = new AirwallexClient()
