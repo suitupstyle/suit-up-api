@@ -15,8 +15,6 @@ interface EnvConfig {
     SUPABASE_URL: string
     SUPABASE_PUBLISHABLE_KEY: string
     SUPABASE_SECRET_KEY: string
-    STRIPE_SECRET_KEY: string
-    STRIPE_WEBHOOK_SECRET: string
     AIRWALLEX_CLIENT_ID: string
     AIRWALLEX_API_KEY: string
     AIRWALLEX_BASE_URL: string
@@ -46,8 +44,6 @@ const env: EnvConfig = {
     SUPABASE_URL: process.env.SUPABASE_URL ?? '',
     SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY ?? '',
     SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY ?? '',
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET ?? '',
     AIRWALLEX_CLIENT_ID: process.env.AIRWALLEX_CLIENT_ID ?? '',
     AIRWALLEX_API_KEY: process.env.AIRWALLEX_API_KEY ?? '',
     AIRWALLEX_BASE_URL: process.env.AIRWALLEX_BASE_URL ?? 'https://api.sandbox.airwallex.com',
