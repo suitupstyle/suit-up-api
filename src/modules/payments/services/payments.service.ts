@@ -1,71 +1,168 @@
 import env from '../../../config/env'
+import {
+    AirwallexPaymentIntent,
+    AirwallexWebhookEvent,
+    airwallex,
+    parseAirwallexWebhook,
+} from '../../../utils/airwallex'
 import { HttpError } from '../../../utils/error'
-import { stripe } from '../../../utils/stripe'
+import logger from '../../../utils/logger'
+import { OrderService } from '../../orders/services/orders.service'
 import { CreatePaymentIntentDTO } from '../validations/create‑payment-intent.schema'
 
+export type CreatedPaymentIntent = {
+    intentId: string
+    clientSecret: string
+    currency: string
+}
+
 export class PaymentService {
-    // ---------------------------------------------------------------------------
-    // Payment Intent flow
-    // ---------------------------------------------------------------------------
-    async createPaymentIntent(input: CreatePaymentIntentDTO): Promise<string> {
-        try {
-            const paymentIntent = await stripe.paymentIntents.create({
-                amount: input.amount,
-                currency: input.currency ?? 'usd',
-                metadata: {
-                    order_id: input.orderId.toString(),
-                },
-                // Omitting payment_method_types enables dynamic payment methods
-                // (Stripe auto-selects based on currency, location, amount, etc.)
-            })
+    private readonly orderService = new OrderService()
 
-            return paymentIntent.client_secret!
-        } catch (err: any) {
-            const message = err.raw?.message ?? err.message ?? 'PaymentIntent creation failed'
-            const status = err.statusCode ?? 502
+    async createPaymentIntent(input: CreatePaymentIntentDTO): Promise<CreatedPaymentIntent> {
+        const order = await this.orderService.findByIdOrFail(input.orderId)
 
-            throw new HttpError(status, message)
+        if (order.isPaid) {
+            throw new HttpError(409, 'Order is already paid')
         }
-    }
 
-    // ---------------------------------------------------------------------------
-    // Checkout Session flow (kept for potential future use)
-    // ---------------------------------------------------------------------------
-    async createCheckoutSession(input: CreatePaymentIntentDTO): Promise<string> {
+        const amount = roundMajorUnits(Number(order.pricingData.price) * (1 + env.TAX_RATE))
+        if (!(amount > 0)) {
+            throw new HttpError(422, 'Order amount must be greater than 0')
+        }
+
+        const currency = (input.currency ?? order.pricingData.currency ?? 'usd').toUpperCase()
+
         try {
-            const session = await stripe.checkout.sessions.create({
-                ui_mode: 'embedded_page',
-                mode: 'payment',
-                return_url: `${env.FRONTEND_BASE_URL}/orders/payment-confirmation?session_id={CHECKOUT_SESSION_ID}`,
-                line_items: [
-                    {
-                        price_data: {
-                            currency: input.currency ?? 'usd',
-                            product_data: { name: 'Suit Order' },
-                            unit_amount: input.amount,
-                        },
-                        quantity: 1,
-                    },
-                ],
+            const paymentIntent = await airwallex.createPaymentIntent({
+                amount,
+                currency,
+                merchantOrderId: String(order.id),
+                returnUrl: `${env.FRONTEND_BASE_URL}/orders/payment-confirmation?orderId=${order.id}`,
                 metadata: {
-                    order_id: input.orderId.toString(),
+                    order_id: String(order.id),
                 },
             })
 
-            return session.client_secret!
-        } catch (err: any) {
-            const message = err.raw?.message ?? err.message ?? 'Checkout session creation failed'
-            const status = err.statusCode ?? 502
+            if (!paymentIntent.client_secret) {
+                throw new HttpError(502, 'Airwallex did not return a client secret')
+            }
 
-            throw new HttpError(status, message)
+            logger.info('Airwallex PaymentIntent created', {
+                orderId: order.id,
+                paymentIntentId: paymentIntent.id,
+                amount,
+                currency: paymentIntent.currency,
+            })
+
+            return {
+                intentId: paymentIntent.id,
+                clientSecret: paymentIntent.client_secret,
+                currency: paymentIntent.currency,
+            }
+        } catch (err) {
+            if (err instanceof HttpError) {
+                throw err
+            }
+
+            throw new HttpError(502, 'PaymentIntent creation failed')
         }
     }
 
-    handleWebhookSignature(payload: Buffer, signature: string, webhookSecret: string) {
+    parseWebhook(
+        payload: Buffer,
+        timestamp: string | undefined,
+        signature: string | undefined
+    ): AirwallexWebhookEvent {
+        return parseAirwallexWebhook(payload, timestamp, signature, env.AIRWALLEX_WEBHOOK_SECRET)
+    }
+
+    async handleWebhookEvent(event: AirwallexWebhookEvent): Promise<void> {
+        const eventName = event.name
+        const paymentIntent = event.data?.object
+
+        switch (eventName) {
+            case 'payment_intent.succeeded': {
+                if (!paymentIntent) {
+                    logger.error('payment_intent.succeeded missing data.object', {
+                        eventId: event.id,
+                        eventName,
+                    })
+                    return
+                }
+
+                await this.fulfillSucceededPayment(paymentIntent, eventName)
+                return
+            }
+            case 'payment_intent.cancelled': {
+                logger.info('PaymentIntent cancelled', {
+                    paymentIntentId: paymentIntent?.id,
+                    orderId: paymentIntent ? resolveOrderId(paymentIntent) : undefined,
+                    eventName,
+                })
+                return
+            }
+            default:
+                logger.info('Ignored Airwallex webhook event', {
+                    eventId: event.id,
+                    eventName,
+                })
+        }
+    }
+
+    private async fulfillSucceededPayment(
+        paymentIntent: AirwallexPaymentIntent,
+        eventName: string
+    ): Promise<void> {
+        const orderId = resolveOrderId(paymentIntent)
+
+        logger.info('PaymentIntent succeeded', {
+            paymentIntentId: paymentIntent.id,
+            orderId,
+            eventName,
+        })
+
+        if (!orderId) {
+            logger.error('No orderId on PaymentIntent, skipping fulfillment', {
+                paymentIntentId: paymentIntent.id,
+                merchantOrderId: paymentIntent.merchant_order_id,
+                eventName,
+            })
+            return
+        }
+
         try {
-            return stripe.webhooks.constructEvent(payload, signature, webhookSecret)
-        } catch (err: any) {
-            throw new HttpError(400, `Webhook Error: ${err.message}`)
+            const order = await this.orderService.findByIdOrFail(orderId)
+            const wasPaid = await this.orderService.markAsPaid(order)
+
+            if (wasPaid) {
+                await this.orderService.enqueueExcelGeneration(order)
+                logger.info('Excel queued for order', { orderId })
+            }
+        } catch (e) {
+            logger.error('Error processing payment_intent.succeeded', {
+                err: e,
+                orderId,
+                eventName,
+            })
         }
     }
+}
+
+function resolveOrderId(paymentIntent: AirwallexPaymentIntent): number | undefined {
+    const fromMerchant = Number(paymentIntent.merchant_order_id)
+    if (Number.isInteger(fromMerchant) && fromMerchant > 0) {
+        return fromMerchant
+    }
+
+    const fromMeta = Number(paymentIntent.metadata?.order_id)
+    if (Number.isInteger(fromMeta) && fromMeta > 0) {
+        return fromMeta
+    }
+
+    return undefined
+}
+
+function roundMajorUnits(value: number): number {
+    return Math.round(value * 100) / 100
 }

@@ -47,9 +47,15 @@ services:
         sync: false
       - key: SUPABASE_SECRET_KEY
         sync: false
-      - key: STRIPE_SECRET_KEY
+      - key: AIRWALLEX_CLIENT_ID
         sync: false
-      - key: STRIPE_WEBHOOK_SECRET
+      - key: AIRWALLEX_API_KEY
         sync: false
+      - key: AIRWALLEX_WEBHOOK_SECRET
+        sync: false
+      - key: AIRWALLEX_BASE_URL
+        sync: false
+      - key: TAX_RATE
+        value: '0.08'
       - key: APP_TOKEN
         sync: false
