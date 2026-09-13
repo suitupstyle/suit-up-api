@@ -15,8 +15,11 @@ interface EnvConfig {
     SUPABASE_URL: string
     SUPABASE_PUBLISHABLE_KEY: string
     SUPABASE_SECRET_KEY: string
-    STRIPE_SECRET_KEY: string
-    STRIPE_WEBHOOK_SECRET: string
+    AIRWALLEX_CLIENT_ID: string
+    AIRWALLEX_API_KEY: string
+    AIRWALLEX_BASE_URL: string
+    AIRWALLEX_WEBHOOK_SECRET: string
+    TAX_RATE: number
     DATABASE_HOST: string
     DATABASE_PORT: string
     DATABASE_USER: string
@@ -41,8 +44,11 @@ const env: EnvConfig = {
     SUPABASE_URL: process.env.SUPABASE_URL ?? '',
     SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY ?? '',
     SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY ?? '',
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET ?? '',
+    AIRWALLEX_CLIENT_ID: process.env.AIRWALLEX_CLIENT_ID ?? '',
+    AIRWALLEX_API_KEY: process.env.AIRWALLEX_API_KEY ?? '',
+    AIRWALLEX_BASE_URL: process.env.AIRWALLEX_BASE_URL ?? 'https://api.sandbox.airwallex.com',
+    AIRWALLEX_WEBHOOK_SECRET: process.env.AIRWALLEX_WEBHOOK_SECRET ?? '',
+    TAX_RATE: parseTaxRate(process.env.TAX_RATE),
     DATABASE_HOST: process.env.DATABASE_HOST ?? '',
     DATABASE_PORT: process.env.DATABASE_PORT ?? '',
     DATABASE_USER: process.env.DATABASE_USER ?? '',
@@ -58,6 +64,11 @@ for (const [key, value] of Object.entries(env)) {
     if (value === undefined || value === null || value === '') {
         throw new Error(`Environment variable is not defined: ${key}`)
     }
+}
+
+function parseTaxRate(value: string | undefined): number {
+    const parsed = Number.parseFloat(value ?? '0.08')
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0.08
 }
 
 export default env
