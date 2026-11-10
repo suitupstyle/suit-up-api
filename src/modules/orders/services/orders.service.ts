@@ -118,7 +118,12 @@ export class OrderService {
                 measurementData: preorder.measurementData,
                 pricingData: {
                     currency: 'USD',
-                    price: items.reduce<number>((sum, item) => sum + item.price, 0) * orderQuantity,
+                    // Postgres decimal columns arrive as strings. Sum integer cents
+                    // to avoid string concatenation and floating-point price drift.
+                    price:
+                        (items.reduce((sum, item) => sum + Math.round(Number(item.price) * 100), 0) *
+                            (orderQuantity ?? 1)) /
+                        100,
                 },
                 customer,
                 items,
